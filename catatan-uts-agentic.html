@@ -1,0 +1,1001 @@
+<title>Catatan UTS Agentic AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: satu kolom catatan kuliah, nav bab menempel di atas, kartu stabilo untuk hafalan */
+:root{
+  --paper:#f6f7fa; --sheet:#ffffff; --ink:#1a2132; --muted:#586379; --line:#dce1ea;
+  --accent:#2343c9; --accent-soft:#e6ebfb; --mark:#fff0a3; --mark-ink:#3d3200;
+  --warn:#b4471b; --warn-soft:#fbeae2; --code:#eef1f8; --ok:#1d7a4c;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#11141b; --sheet:#181c26; --ink:#e5e8ef; --muted:#9ba4b6; --line:#2a3141;
+  --accent:#8ea6ff; --accent-soft:#1f2747; --mark:#4a3f0e; --mark-ink:#ffeaa0;
+  --warn:#ff9a6b; --warn-soft:#3a2219; --code:#1f2533; --ok:#5fd39a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11141b; --sheet:#181c26; --ink:#e5e8ef; --muted:#9ba4b6; --line:#2a3141;
+  --accent:#8ea6ff; --accent-soft:#1f2747; --mark:#4a3f0e; --mark-ink:#ffeaa0;
+  --warn:#ff9a6b; --warn-soft:#3a2219; --code:#1f2533; --ok:#5fd39a; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:24px 80px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,4vw,2rem);font-weight:800;letter-spacing:-.01em}
+h3{font-size:1.15rem;font-weight:700;margin-top:28px;margin-bottom:8px}
+p{margin:8px 0}
+a{color:var(--accent)}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header.top{display:grid;gap:10px;padding-bottom:20px;border-bottom:2px solid var(--ink)}
+header.top .meta{color:var(--muted);font-size:.95rem}
+
+nav.chips{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);
+  display:flex;gap:6px;overflow-x:auto;padding-block:10px;margin-inline:-16px;padding-inline:16px;border-bottom:1px solid var(--line)}
+nav.chips a{flex:none;text-decoration:none;color:var(--ink);font-family:var(--f-mono);font-size:.8rem;
+  padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--sheet)}
+nav.chips a:hover,nav.chips a:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+
+section.bab{margin-top:44px;display:grid;gap:4px}
+.bab-head{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.bab-no{font-family:var(--f-mono);font-weight:600;color:var(--accent);font-size:.95rem}
+.lead{font-size:1.05rem;color:var(--ink)}
+
+.hafal{background:var(--mark);color:var(--mark-ink);border-radius:6px;padding:12px 14px;margin:14px 0}
+.hafal .eyebrow{color:var(--mark-ink);opacity:.8}
+.hafal strong{font-family:var(--f-display);font-size:1.05rem}
+.rawan{border-left:4px solid var(--warn);background:var(--warn-soft);padding:10px 14px;margin:14px 0;border-radius:0 6px 6px 0}
+.rawan .eyebrow{color:var(--warn)}
+
+ul,ol{padding-left:22px;margin:8px 0}
+li{margin:3px 0}
+.flow{font-family:var(--f-mono);font-size:.85rem;background:var(--code);padding:8px 12px;border-radius:6px;overflow-x:auto;white-space:nowrap}
+.f{font-family:var(--f-mono);font-size:.88rem;background:var(--code);padding:10px 12px;border-radius:6px;overflow-x:auto;white-space:pre;line-height:1.5;margin:8px 0}
+
+.tbl{overflow-x:auto;margin:10px 0;border:1px solid var(--line);border-radius:6px;background:var(--sheet)}
+table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--code)}
+tr:last-child td{border-bottom:0}
+td.n{text-align:right}
+
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:10px 0}
+.two > div{min-width:0;background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+.two h4{margin:0 0 4px;font-family:var(--f-display);font-size:1rem}
+
+/* peta cepat */
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px}
+.map > div{min-width:0;background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.map b{font-family:var(--f-display)}
+.map .eyebrow{display:block;margin-bottom:2px}
+
+/* latihan */
+details.soal{background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:10px 0}
+details.soal summary{cursor:pointer;font-weight:700;list-style:none}
+details.soal summary::-webkit-details-marker{display:none}
+details.soal summary::after{content:" (lihat jawaban)";font-weight:400;color:var(--accent);font-size:.85rem}
+details.soal[open] summary::after{content:" (tutup)"}
+details.soal .ans{border-top:1px dashed var(--line);margin-top:8px;padding-top:8px}
+
+/* flashcard */
+.fc{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:12px;display:grid;gap:12px}
+.fc-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fc-bar label{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+select,button{font:inherit;font-size:.9rem;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 10px}
+button{cursor:pointer}
+button:hover,button:focus-visible,select:focus-visible{border-color:var(--accent);outline:2px solid var(--accent-soft)}
+button.primary{background:var(--accent);color:var(--sheet);border-color:var(--accent)}
+.card{min-height:190px;border:2px solid var(--ink);border-radius:8px;padding:18px;display:grid;align-content:center;gap:8px;cursor:pointer;background:var(--paper)}
+.card .side{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.card .txt{font-size:1.1rem;white-space:pre-line}
+.card.back{border-color:var(--accent)}
+.card.back .txt{font-size:1rem}
+.fc-stat{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.fc-stat b{color:var(--ok)}
+footer{margin-top:60px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">AI Agentic Technology Systems for Digital Enterprise Ecosystem · Prof. Dr. Azhari, MT</span>
+  <h1>Catatan UTS Agentic AI</h1>
+  <p class="meta">Rangkuman Bab I sampai V untuk ujian close book. Tiap bab punya jembatan keledai (kotak kuning) dan bagian yang rawan keluar (kotak oranye). Di bawah ada lembar rumus, latihan hitung, dan flashcard.</p>
+  <p class="meta mono">Tio Rizky Almunazir · 26/589483/PPA/07359 · Magister Kecerdasan Artifisial UGM</p>
+</header>
+
+<nav class="chips" aria-label="Lompat ke bagian">
+  <a href="#peta">Peta cepat</a><a href="#bab1">Bab 1</a><a href="#bab2">Bab 2</a><a href="#bab3">Bab 3</a><a href="#bab4">Bab 4</a><a href="#bab5">Bab 5</a><a href="#rumus">Lembar rumus</a><a href="#latihan">Latihan hitung</a><a href="#flash">Flashcard</a>
+</nav>
+
+<!-- PETA CEPAT -->
+<section class="bab" id="peta">
+  <div class="bab-head"><span class="bab-no">00</span><h2>Peta cepat 5 bab</h2></div>
+  <p class="lead">Kalau cuma sempat baca satu bagian sebelum masuk ruang ujian, baca ini.</p>
+  <div class="map">
+    <div><span class="eyebrow">Bab 1 · Evolusi AI</span><b>8 era AI</b>: Traditional, ML, DL, GenAI, AI Agent, Agentic AI, Multi-Agentic, Autonomous Enterprise. Makin ke kanan, otonomi naik dan kebutuhan governance ikut naik.</div>
+    <div><span class="eyebrow">Bab 2 · Fondasi agen</span><b>7 fondasi</b>: Environment, Rationality, Goals, Perception, Action, Autonomy, Learning. Plus PEAS, reactive vs deliberative, 4 komponen learning agent.</div>
+    <div><span class="eyebrow">Bab 3 · Single agent</span><b>BDI</b> (Belief, Desire, Intention), A = &lt;G,B,I,M,C,R,P,T&gt;, runtime, memory, tools/function calling, execution loop, studi kasus seleksi supplier.</div>
+    <div><span class="eyebrow">Bab 4 · Multi-agent</span><b>MAS</b>: arsitektur centralized/decentralized/hybrid, ACL/KQML, konsensus, negosiasi, lelang, Contract Net, task allocation, Q-learning, trust, interoperabilitas.</div>
+    <div><span class="eyebrow">Bab 5 · Mobile agent</span><b>Mobile agent</b> membawa kode + state pindah host. Protokol migrasi, arsitektur 5 modul, RL/MDP untuk migrasi, LLM, RAG, GNN, MIMA (Scout, Broker, Worker, Security).</div>
+    <div><span class="eyebrow">Pola yang terus diulang dosen</span>Model menghasilkan skor, lalu dicek reasoning dan policy engine. Aksi hanya jalan kalau <b>authority, confidence, dan constraint</b> terpenuhi. Aksi berdampak tinggi atau confidence rendah masuk ke human approval.</div>
+  </div>
+</section>
+
+<!-- BAB 1 -->
+<section class="bab" id="bab1">
+  <div class="bab-head"><span class="bab-no">BAB I</span><h2>Evolusi AI dan teknologi agentic</h2></div>
+  <p class="lead">AI berevolusi dari sistem yang "menjawab" menjadi sistem yang "menjalankan bisnis": dari rules yang mengeksekusi instruksi sampai enterprise otonom yang bisa sense, decide, act, collaborate, dan learn.</p>
+
+  <div class="hafal"><span class="eyebrow">Jembatan keledai · 8 era dan kata kerjanya</span><br>
+  <strong>"Raja Lapar Rebus Gado-gado, Ambil Piring Cuci Alat"</strong><br>
+  Rules (Traditional AI) · Learn (ML) · Represent (DL) · Generate (GenAI) · Act (AI Agent) · Plan (Agentic AI) · Collaborate (Multi-Agentic) · Autonomize (Autonomous Enterprise)</div>
+
+  <h3>Tabel 8 era (hafalkan tahunnya)</h3>
+  <div class="tbl"><table>
+    <tr><th>#</th><th>Era</th><th>Mulai</th><th>Konsep utama</th><th>Contoh</th></tr>
+    <tr><td>1</td><td>Traditional / Symbolic AI</td><td>1956</td><td>Rules, logic, search, knowledge representation, expert system</td><td>MYCIN, chess AI, rule-based diagnosis</td></tr>
+    <tr><td>2</td><td>Machine Learning</td><td>1959</td><td>Belajar pola dari data untuk prediksi dan klasifikasi</td><td>Credit scoring, fraud detection, rekomendasi</td></tr>
+    <tr><td>3</td><td>Deep Learning</td><td>2006</td><td>Neural network berlapis, pola kompleks</td><td>Face/speech recognition, medical imaging</td></tr>
+    <tr><td>4</td><td>Generative AI</td><td>2014, meledak 2022</td><td>Menghasilkan konten baru: teks, gambar, audio, video, kode</td><td>ChatGPT, Copilot, DALL·E</td></tr>
+    <tr><td>5</td><td>AI Agents</td><td>2022-2023</td><td>Punya goal, memory, tools, reasoning, action</td><td>Customer-service agent, coding agent</td></tr>
+    <tr><td>6</td><td>Agentic AI</td><td>2023-2024</td><td>Merencanakan dan mengeksekusi multi-step task semi/otonom</td><td>Procurement agent, workflow agent</td></tr>
+    <tr><td>7</td><td>Multi-Agentic AI</td><td>2023-2025</td><td>Banyak agen spesialis berkolaborasi</td><td>Supplier + Logistics + Finance + Customer Agent</td></tr>
+    <tr><td>8</td><td>Autonomous Enterprise</td><td>2025 ke depan</td><td>Sense, reason, decide, act, learn terus-menerus</td><td>Autonomous supply chain, self-optimizing factory</td></tr>
+  </table></div>
+
+  <h3>1.1 Traditional AI</h3>
+  <p>Pengetahuan manusia ditulis jadi simbol, aturan IF-THEN, logika, dan fungsi evaluasi. Tiga pilar: <b>symbolic representation</b>, <b>rules & logic</b>, <b>search & planning</b>. Sifatnya explainable dan deterministic, tapi <b>brittle</b> (rapuh terhadap kondisi baru).</p>
+  <ul>
+    <li>Contoh rule credit approval: IF score ≥ 700 AND DTI &lt; 35% maka APPROVE.</li>
+    <li>Milestone: <b>Deep Blue (IBM, 1997)</b> mengalahkan juara catur dunia dalam 6 game. Kuncinya search + evaluation function + hardware khusus.</li>
+    <li>Kapan masih dipakai: policy engine, compliance, eligibility, tax/pricing rules, safety guardrails.</li>
+    <li>Key idea: sistem modern itu <b>hybrid</b>, probabilistic intelligence untuk reasoning dan deterministic rules untuk batas aman.</li>
+  </ul>
+
+  <h3>1.2 Machine Learning</h3>
+  <div class="flow">Data → Features → Training → Model → Decision</div>
+  <p>Tiga paradigma: <b>supervised</b> (data berlabel, klasifikasi/regresi), <b>unsupervised</b> (tanpa label: clustering, anomaly), <b>reinforcement</b> (agen belajar policy dari reward). Di enterprise nilainya muncul kalau prediksi nyambung ke workflow: detect → score → prioritize → act.</p>
+  <div class="tbl"><table>
+    <tr><th>Aspek</th><th>Traditional AI</th><th>Machine Learning</th></tr>
+    <tr><td>Sumber kecerdasan</td><td>Rules buatan manusia</td><td>Pola dari data</td></tr>
+    <tr><td>Output</td><td>Hasil rule / rencana aksi</td><td>Probabilitas, skor, prediksi</td></tr>
+    <tr><td>Adaptasi</td><td>Update rule manual</td><td>Retraining / online learning</td></tr>
+    <tr><td>Explainability</td><td>Umumnya tinggi</td><td>Tergantung model</td></tr>
+    <tr><td>Risiko</td><td>Rule gaps</td><td>Bias, drift, data leakage</td></tr>
+  </table></div>
+  <p><i>Rules tell the system HOW. Data teaches the model WHAT pattern.</i></p>
+
+  <h3>1.3 Deep Learning</h3>
+  <p>Subset ML yang fokus pada neural network bertingkat dan <b>representation learning</b> (fitur dipelajari otomatis). Kuat untuk data tidak terstruktur: image, audio, teks, time series. Milestone: <b>AlphaGo (2016)</b> mengalahkan Lee Sedol 4-1, gabungan deep network + search + RL.</p>
+  <div class="tbl"><table>
+    <tr><th>Dimensi</th><th>Classical ML</th><th>Deep Learning</th></tr>
+    <tr><td>Feature engineering</td><td>Manual / domain</td><td>Dipelajari otomatis</td></tr>
+    <tr><td>Kebutuhan data</td><td>Rendah-sedang</td><td>Sedang-sangat tinggi</td></tr>
+    <tr><td>Compute</td><td>Moderat</td><td>Intensif GPU</td></tr>
+    <tr><td>Interpretability</td><td>Lebih mudah</td><td>Lebih sulit</td></tr>
+  </table></div>
+  <p>Design principle: pilih model <b>paling sederhana</b> yang memenuhi kebutuhan akurasi, latency, biaya, explainability, dan governance.</p>
+
+  <h3>1.4 Generative AI</h3>
+  <div class="flow">Pretraining → instruction tuning → enterprise grounding → controlled generation</div>
+  <p>Foundation model belajar distribusi data skala besar. Tiga cara pakai di enterprise: <b>Prompting, RAG, Tool use</b>. GenAI jadi "cognitive layer" enterprise, tapi tetap butuh grounding, validasi, dan access control.</p>
+  <div class="tbl"><table>
+    <tr><th>Aspek</th><th>Predictive AI</th><th>Generative AI</th></tr>
+    <tr><td>Output</td><td>Skor / kelas / forecast</td><td>Teks / kode / gambar / multimodal</td></tr>
+    <tr><td>Pertanyaan</td><td>Apa yang akan terjadi?</td><td>Apa yang bisa dibuat / dijelaskan?</td></tr>
+    <tr><td>Risiko</td><td>Bias, drift, salah prediksi</td><td>Halusinasi, IP, kebocoran data</td></tr>
+    <tr><td>Kontrol</td><td>Threshold, monitoring</td><td>Grounding, tool policy, human review</td></tr>
+    <tr><td>Pola</td><td>Predict → trigger workflow</td><td>Generate → validate → act</td></tr>
+  </table></div>
+  <p>Best practice: gabungkan predictive signals + generative reasoning + deterministic controls.</p>
+
+  <h3>1.5 AI Agent</h3>
+  <p><b>AI Agent = Model + Instructions + Tools + Memory/State</b>, dijaga oleh guardrails, human handoff, dan observability.</p>
+  <div class="flow">1 Perceive → 2 Reason → 3 Act → 4 Observe → 5 Update state/memory → ulang</div>
+  <p>Contoh refund: identify order → inspect policy → check payment → issue refund → notify customer → log outcome.</p>
+  <div class="tbl"><table>
+    <tr><th>Aspek</th><th>Chatbot</th><th>AI Agent</th></tr>
+    <tr><td>Tujuan</td><td>Menjawab / membantu</td><td>Menyelesaikan task</td></tr>
+    <tr><td>Tool use</td><td>Opsional</td><td>Kemampuan inti</td></tr>
+    <tr><td>Workflow</td><td>Interaksi pendek</td><td>Eksekusi multi-step</td></tr>
+    <tr><td>State</td><td>Konteks percakapan</td><td>Task state + progress + memory</td></tr>
+    <tr><td>Gagal</td><td>Tanya user / berhenti</td><td>Retry, ganti tool, eskalasi</td></tr>
+  </table></div>
+  <p><i>A chatbot talks. An agent gets work done.</i></p>
+
+  <h3>1.6 Agentic AI</h3>
+  <p>Enam ciri: <b>goal-oriented, planning, tool orchestration, reflection, bounded autonomy, escalation</b>. Agentic tidak sama dengan otonomi tanpa batas: tetap perlu scope, permission, policy, monitoring, dan akuntabilitas manusia.</p>
+  <div class="flow">Order-to-Cash: Interpret intent → Plan → Act (ERP, CRM, WMS) → Reflect → Complete</div>
+  <div class="tbl"><table>
+    <tr><th>Level</th><th>Peran manusia</th><th>Peran AI</th><th>Contoh</th></tr>
+    <tr><td>L0 Manual</td><td>Kerjakan semua</td><td>Tidak ada</td><td>Review invoice manual</td></tr>
+    <tr><td>L1 Rule Automation</td><td>Desain rules</td><td>Eksekusi langkah tetap</td><td>RPA</td></tr>
+    <tr><td>L2 AI-Assisted</td><td>Putuskan & bertindak</td><td>Rekomendasi / generate</td><td>Copilot</td></tr>
+    <tr><td>L3 AI Agent</td><td>Beri task + awasi</td><td>Eksekusi bounded task</td><td>Support / IT agent</td></tr>
+    <tr><td>L4 Agentic Workflow</td><td>Set objective / approve exception</td><td>Plan + eksekusi multi-step</td><td>Order-to-cash</td></tr>
+    <tr><td>L5 Autonomous Domain</td><td>Govern + monitor</td><td>Koordinasi domain terus-menerus</td><td>Autonomous service ops</td></tr>
+  </table></div>
+
+  <h3>1.7 Multi-Agentic AI</h3>
+  <p>Orchestrator agent membagi tujuan besar ke agen spesialis (Sales, Supply, Finance, Delivery, Risk). Alasan pakai banyak agen: <b>specialization, parallelism, modularity, separation of authority, organizational mapping</b>.</p>
+  <div class="two">
+    <div><h4>A2A (Agent-to-Agent)</h4>Agent discovery, komunikasi, delegasi, kolaborasi lintas vendor. "Bagaimana agen bicara ke agen lain."</div>
+    <div><h4>MCP (Model Context Protocol)</h4>Koneksi standar dari agen ke tools, data, workflow. "Bagaimana agen tersambung ke kapabilitas."</div>
+  </div>
+  <div class="tbl"><table>
+    <tr><th>Dimensi</th><th>Single Agent</th><th>Multi-Agent</th></tr>
+    <tr><td>Scope</td><td>Peran luas</td><td>Peran spesialis</td></tr>
+    <tr><td>Eksekusi</td><td>Sekuensial</td><td>Paralel + delegasi</td></tr>
+    <tr><td>Konteks</td><td>Satu context window</td><td>Konteks terdistribusi</td></tr>
+    <tr><td>Kegagalan</td><td>Terpusat</td><td>Bisa diisolasi / reroute</td></tr>
+    <tr><td>Governance</td><td>Lebih sederhana</td><td>Lebih kompleks</td></tr>
+  </table></div>
+  <p>Rule of thumb: jangan pakai multi-agent kalau satu agen + tools sudah cukup.</p>
+
+  <h3>1.8 Autonomous Enterprise</h3>
+  <div class="flow">SENSE → DECIDE → ACT → LEARN, dengan GOVERN (policy, identity, audit) di tengah</div>
+  <p>Tiga lapisan: <b>Human governance layer</b> (strategi, policy, approval, akuntabilitas) di atas <b>Agentic work layer</b> (orchestrator, agen spesialis, copilot) di atas <b>Digital enterprise layer</b> (ERP, CRM, SCM, IoT, API).</p>
+  <div class="hafal"><span class="eyebrow">Roadmap 5 tahap</span><br><strong>Assist → Automate → Agentize → Orchestrate → Autonomize</strong><br>(Copilot → RPA + predictive → service/IT agent → multi-agent process → closed-loop domain ops)</div>
+
+  <div class="rawan"><span class="eyebrow">Rawan keluar</span>
+  <ul>
+    <li>Perbedaan chatbot vs AI agent, dan AI agent vs agentic AI vs multi-agentic AI.</li>
+    <li>Tabel predictive vs generative AI.</li>
+    <li>Level maturity L0 sampai L5.</li>
+    <li>A2A vs MCP.</li>
+    <li>Grand matrix: autonomy naik dari Very low (Traditional) ke High, governed (Autonomous Enterprise). Evolusi = kemampuan menangani ketidakpastian, konteks, tools, kolaborasi, dan tanggung jawab bisnis.</li>
+  </ul></div>
+</section>
+
+<!-- BAB 2 -->
+<section class="bab" id="bab2">
+  <div class="bab-head"><span class="bab-no">BAB II</span><h2>Fondasi intelligent agents</h2></div>
+  <p class="lead">Agen adalah entitas yang bisa <b>perceive</b> (lewat sensor) dan <b>act</b> (lewat actuator) di dalam environment, berulang-ulang dalam siklus observe → decide → act → feedback.</p>
+
+  <div class="hafal"><span class="eyebrow">Jembatan keledai · 7 fondasi</span><br>
+  <strong>"Enak Rasanya Gado-gado Pak Ahmad Asli Lombok"</strong><br>
+  Environment (di mana) · Rationality (cara memilih) · Goals (mau apa) · Perception (apa yang dilihat) · Action (apa yang dieksekusi) · Autonomy (seberapa mandiri) · Learning (cara berkembang)</div>
+
+  <h3>2.1 Karakteristik environment</h3>
+  <div class="tbl"><table>
+    <tr><th>Karakteristik</th><th>Pilihan A</th><th>Pilihan B</th><th>Contoh</th></tr>
+    <tr><td>Observability</td><td>Fully observable</td><td>Partially observable</td><td>Catur vs mobil otonom</td></tr>
+    <tr><td>Outcome</td><td>Deterministic</td><td>Stochastic</td><td>Workflow rule vs demand pasar</td></tr>
+    <tr><td>Change</td><td>Static</td><td>Dynamic</td><td>Sudoku vs logistik live</td></tr>
+    <tr><td>Actors</td><td>Single-agent</td><td>Multi-agent</td><td>Planner vs marketplace</td></tr>
+  </table></div>
+  <p>Environment enterprise umumnya <b>partially observable, stochastic, dynamic, multi-agent</b>. Makin ke arah itu, makin butuh memory, probabilistic reasoning, planning, koordinasi, dan learning.</p>
+
+  <h3>2.2 Rational agent</h3>
+  <p>Memilih aksi dengan <b>expected performance terbaik</b> berdasarkan informasi yang tersedia saat itu. <b>Rationality ≠ omniscience</b>: agen tetap rasional walau hasil akhirnya buruk, asal keputusannya terbaik menurut evidence dan constraint saat keputusan dibuat.</p>
+  <p>Empat faktor penentu keputusan rasional:</p>
+  <div class="tbl"><table>
+    <tr><th>Faktor</th><th>Peran</th><th>Contoh enterprise</th></tr>
+    <tr><td>Performance measure</td><td>Definisi sukses</td><td>SLA, revenue, error rate</td></tr>
+    <tr><td>Prior knowledge</td><td>Konteks awal</td><td>Business rules, policy</td></tr>
+    <tr><td>Percept history</td><td>Evidence historis</td><td>Transaksi, tiket</td></tr>
+    <tr><td>Available actions</td><td>Batas opsi eksekusi</td><td>Approve, reject, escalate</td></tr>
+  </table></div>
+
+  <h3>PEAS</h3>
+  <div class="tbl"><table>
+    <tr><th>Komponen</th><th>Smart Warehouse</th><th>Fraud Detection</th></tr>
+    <tr><td>P · Performance</td><td>Akurasi sortir, efisiensi waktu distribusi</td><td>Tingkat deteksi transaksi mencurigakan, kecepatan respons</td></tr>
+    <tr><td>E · Environment</td><td>Gudang dengan sensor IoT, kamera, robot sortir</td><td>Jaringan transaksi bank, data nasabah, sistem keamanan</td></tr>
+    <tr><td>A · Actuators</td><td>Lengan robot, conveyor, ERP</td><td>Notifikasi risiko, blokir transaksi otomatis</td></tr>
+    <tr><td>S · Sensors</td><td>Kamera pengenal barang, sensor berat dan suhu</td><td>Log transaksi, pemantauan aktivitas akun</td></tr>
+  </table></div>
+
+  <h3>2.3 Agent goals</h3>
+  <p>Goal = state yang ingin dicapai; agen memilih aksi yang memperkecil gap antara current state dan desired state. Hierarki: <b>Operational</b> (reorder, route, respond) → <b>Tactical</b> (kapasitas, sourcing) → <b>Strategic</b> (profitabilitas, resilience).</p>
+  <div class="tbl"><table>
+    <tr><th>Tipe</th><th>Ciri</th><th>Contoh</th></tr>
+    <tr><td>Goal-based</td><td>Satu target akhir mutlak</td><td>Pengiriman dalam kota ≤ 24 jam</td></tr>
+    <tr><td>Utility-based</td><td>Pilih opsi dengan skor terbaik</td><td>Rekomendasi produk (harga, rating, stok)</td></tr>
+    <tr><td>Multi-objective</td><td>Seimbangkan beberapa target</td><td>Transportasi smart city: kecepatan, energi, polusi</td></tr>
+  </table></div>
+  <div class="f">Choose action = maximize Utility subject to Goal + Constraints</div>
+  <p>Goal = apa yang ingin dicapai. Utility = outcome mana lebih disukai. Constraint = apa yang tidak boleh dilanggar (budget, compliance, privacy, safety).</p>
+
+  <h3>2.4 Perception dan action</h3>
+  <div class="flow">SENSE (API, IoT, UI) → INTERPRET (state, context) → DECIDE (policy, model) → ACT (tool, workflow) → feedback</div>
+  <ul>
+    <li><b>Percept sequence</b> memberi konteks waktu. Suhu mesin 80°C bisa normal kalau stabil, tapi bahaya kalau naik cepat 55 → 60 → 64 → 72 → 80°C. Predictive maintenance pakai urutan, bukan bacaan terakhir saja.</li>
+    <li>Action mapping: stok &lt; reorder point → buat purchase request; sentimen negatif → route ke spesialis; getaran naik → jadwalkan inspeksi; transaksi mencurigakan → hold + review.</li>
+    <li>Sensor = "mata dan telinga" (software sensor: API trafik web; hardware sensor: kamera termal). Actuator = "tangan dan kaki" (digital: bot trading; physical: lengan robot).</li>
+    <li>Siklus: fase persepsi → pemrosesan internal → fase eksekusi → umpan balik observasi.</li>
+  </ul>
+
+  <h3>2.5 Reactive vs deliberative</h3>
+  <div class="tbl"><table>
+    <tr><th>Aspek</th><th>Reactive</th><th>Deliberative</th></tr>
+    <tr><td>Gaya</td><td>Stimulus → response (IF suhu &gt; 26 THEN AC ON)</td><td>Model → plan → action</td></tr>
+    <tr><td>Latency</td><td>Sangat rendah</td><td>Sedang/tinggi</td></tr>
+    <tr><td>Memori</td><td>Minim</td><td>Menyimpan world state</td></tr>
+    <tr><td>Adaptasi</td><td>Kaku</td><td>Fleksibel</td></tr>
+    <tr><td>Cocok untuk</td><td>Real-time control</td><td>Routing, scheduling, procurement</td></tr>
+    <tr><td>Contoh</td><td>Alarm kebakaran bunyi tiap ada asap</td><td>Sistem menilai asap dari masakan atau kebakaran</td></tr>
+  </table></div>
+  <p><b>Hybrid</b>: reactive layer (fast path) untuk event sederhana + deliberative layer (slow path) untuk masalah kompleks. Ini yang dipakai agentic AI enterprise.</p>
+
+  <h3>2.6 Autonomous agent</h3>
+  <div class="hafal"><span class="eyebrow">4 tingkat otonomi (naik)</span><br>
+  <strong>Assist → Approve → Supervise → Delegate</strong><br>
+  1 Assistive (hanya saran) · 2 Human-in-the-loop (tiap aksi penting perlu approval) · 3 Human-on-the-loop (agen bertindak, manusia mengawasi dan bisa override) · 4 Delegated autonomy (wewenang penuh dalam bounded scope)</div>
+  <p>Makin tinggi otonomi, makin ketat kebutuhan observability, audit trail, role-based permission, fallback. Prinsip <b>bounded autonomy</b>: hak bertindak dibatasi menurut domain, value-at-risk, confidence, dan dampak keputusan.</p>
+
+  <h3>2.7 Learning agent</h3>
+  <div class="two">
+    <div><h4>Performance element</h4>Memilih aksi saat ini.</div>
+    <div><h4>Learning element</h4>Memperbarui kemampuan agen.</div>
+    <div><h4>Critic</h4>Menilai hasil terhadap performance measure.</div>
+    <div><h4>Problem generator</h4>Mendorong eksplorasi pengalaman baru.</div>
+  </div>
+  <p>Siklus: ACT → OBSERVE → LEARN → IMPROVE. Contoh: predictive maintenance, adaptive pricing, personalized marketing, intelligent helpdesk.</p>
+
+  <div class="rawan"><span class="eyebrow">Rawan keluar</span>
+  <ul>
+    <li>Buat PEAS untuk satu kasus (latih dengan kasus sendiri, misalnya ojek online atau e-commerce).</li>
+    <li>Kenapa rationality ≠ omniscience.</li>
+    <li>4 komponen learning agent (sering tertukar antara critic dan learning element).</li>
+    <li>Beda human-in-the-loop dan human-on-the-loop.</li>
+  </ul></div>
+</section>
+
+<!-- BAB 3 -->
+<section class="bab" id="bab3">
+  <div class="bab-head"><span class="bab-no">BAB III</span><h2>Sistem agen tunggal cerdas</h2></div>
+  <p class="lead">Kecerdasan agen datang dari koordinasi komponen internalnya. Model AI saja hanya model prediksi statis; baru jadi agen kalau dipadukan dengan goal, memory, tools, context, policy, dan action.</p>
+
+  <h3>3.1 Komponen dan alur kognitif</h3>
+  <p>Komponen: Goal, Environment, Perception, Belief, Reasoning, Planning, Intention, Action, Feedback.</p>
+  <div class="flow">Perceive → Understand → Reason → Plan → Intend & Act → Learn</div>
+
+  <h3>3.2 Model BDI</h3>
+  <div class="tbl"><table>
+    <tr><th>Unsur</th><th>Arti</th><th>Contoh pabrik</th><th>Contoh enterprise</th></tr>
+    <tr><td>Belief</td><td>Apa yang diketahui agen tentang dunia</td><td>Stok rendah</td><td>Data stok gudang di ERP</td></tr>
+    <tr><td>Desire</td><td>Tujuan potensial</td><td>Produksi tetap jalan</td><td>Kurangi biaya logistik</td></tr>
+    <tr><td>Intention</td><td>Tujuan yang dipilih dan dikomitmenkan</td><td>Buat pesanan pembelian</td><td>Pilih rute pengiriman termurah</td></tr>
+  </table></div>
+  <div class="hafal"><span class="eyebrow">Proses reasoning BDI</span><br><strong>Observe → Update Belief → Generate Desire → Commit Intention → Execute → Learn</strong><br>Ingat: B = tahu, D = mau, I = janji/komit.</div>
+  <div class="f">A = &lt;G, B, I, M, C, R, P, T&gt;
+G goal · B belief · I intention · M memory · C context · R reasoning · P planning · T tools
+s(t+1) = F( s(t), o(t), a(t) )        // state berikut dari state, observasi, aksi
+BDI = &lt;B, D, I&gt;     P = &lt;a1, ..., an&gt;   // plan = urutan aksi</div>
+  <p>Kalimat kunci: kecerdasan muncul ketika <b>Reasoning (R) memakai Tools (T) untuk mengubah Belief (B) menjadi Action</b>. Reasoning menentukan arah, planning menentukan cara.</p>
+
+  <h3>3.3 Arsitektur single agent</h3>
+  <p>Satu agen, satu cognitive core, satu decision loop utama. Cocok untuk domain yang jelas dan bounded. Arsitektur yang baik memisahkan persepsi, state, reasoning, model, tools, authority, dan feedback supaya keputusan bisa dijelaskan dan diaudit. Enterprise biasanya pakai hybrid.</p>
+  <p>Contoh order-priority agent (input: customer value, margin, SLA gap, kesiapan stok, risiko pembayaran):</p>
+  <div class="f">p(y=1|x) = σ(wᵀx + b)
+action = expedite  jika  p &gt; τ  dan  policy = 1</div>
+
+  <h3>3.4 Model AI di dalam agen</h3>
+  <p>Metode belajar: supervised, reinforcement, online learning, feedback loop. Portofolio model (tidak semua harus LLM):</p>
+  <div class="tbl"><table>
+    <tr><th>Model</th><th>Tugas</th></tr>
+    <tr><td>LLM / NLP</td><td>Memahami permintaan, instruksi, dokumen tidak terstruktur</td></tr>
+    <tr><td>ML / DL / CV (XGBoost, LSTM, CNN)</td><td>Prediksi, klasifikasi, forecasting, vision, anomaly</td></tr>
+    <tr><td>Statistik</td><td>Tren historis</td></tr>
+    <tr><td>DSS / optimization</td><td>Ranking dan perbandingan alternatif secara matematis</td></tr>
+    <tr><td>Policy engine</td><td>Validasi kepatuhan regulasi perusahaan</td></tr>
+  </table></div>
+  <div class="flow">Request → Select Model → Predict/Reason → Apply Policy → Recommend → Act</div>
+  <div class="f">y = f_θ(x);   z = R·w;   a* = argmax_a U(a | y, c)   subject to policy(a) = 1</div>
+  <p>Kriteria memilih model: <b>akurasi & explainability, latency & cost, privasi & data, skalabilitas</b>.</p>
+
+  <h3>3.5 Runtime dan siklus eksekusi</h3>
+  <p>Runtime mengubah kecerdasan jadi proses produksi yang bisa dieksekusi, dimonitor, dipulihkan, dan dibatasi. Tugasnya: kelola task lifecycle, model calls, memory, tool invocation, state. Lingkungan: VM, container, Kubernetes, cloud, edge, serverless. Security: identity, permission, secrets, network control, sandbox.</p>
+  <div class="flow">Request → Contextualize → Analyze → Plan & Tool Selection → Execute & Observe</div>
+  <div class="hafal"><span class="eyebrow">Agen produksi harus observable · "MTRA"</span><br><strong>Monitoring · Tracing · Recovery · Audit trail</strong><br>Kalau API gagal: retry → fallback → checkpoint → escalation (bila SLA terancam). success_rate = completed / total.</div>
+
+  <h3>3.6 Memory, context, state</h3>
+  <div class="tbl"><table>
+    <tr><th>Komponen</th><th>Fungsi</th><th>Contoh</th></tr>
+    <tr><td>Memory</td><td>Simpan histori, hasil keputusan, pengalaman</td><td>Ingat performa supplier transaksi lalu</td></tr>
+    <tr><td>Context</td><td>Situasi saat ini yang relevan</td><td>Order sedang urgent berdasarkan SLA</td></tr>
+    <tr><td>State</td><td>Status internal saat runtime (aktif, idle, error)</td><td>Mode "decision execution"</td></tr>
+  </table></div>
+  <p>Jenis memory: <b>short-term, long-term, episodic, semantic</b>. Retrieval: Retrieve → Rank → Summarize & Compress → Retention/Forgetting.</p>
+  <div class="f">sim(q, m_i) = (qᵀ m_i) / (‖q‖ ‖m_i‖)     // cosine similarity
+TopK = argsort_i sim(q, m_i)</div>
+
+  <h3>3.7 Tools, functions, APIs</h3>
+  <div class="tbl"><table>
+    <tr><th>Komponen</th><th>Arti</th><th>Contoh</th></tr>
+    <tr><td>Tools</td><td>Modul untuk tugas tertentu</td><td>Search, calculator, SQL, email</td></tr>
+    <tr><td>Functions</td><td>Unit logika operasi spesifik</td><td>extractData(), calculateScore()</td></tr>
+    <tr><td>APIs</td><td>Antarmuka antar sistem</td><td>REST untuk ERP, GraphQL ke DB supplier</td></tr>
+  </table></div>
+  <div class="flow">Function calling: permintaan user → agen pilih fungsi + parameter → validasi & eksekusi → hasil balik ke agen</div>
+  <p>Integrasi API: REST & GraphQL, webhook & event API, security controls, error handling. Pemakaian tool aman: <b>least privilege, tool allow-list, human-in-the-loop, audit trail</b>.</p>
+  <div class="f">t* = argmax_t P(t | intent, context);   execute(t*) hanya jika auth(t*) = 1</div>
+
+  <h3>3.8 Agentic execution dan feedback loop</h3>
+  <p>Eksekusi iteratif: perceive → reason → plan → act → observe sampai goal tercapai atau batas kontrol menghentikan. Reflection memeriksa correctness, completeness, confidence, policy compliance. Batas otonomi: stop, retry, rollback, fallback, escalation.</p>
+  <div class="f">s(t+1) = F( s(t), a(t), o(t+1) )
+stop jika  goal = 1  atau  steps &gt; K  atau  cost &gt; B  atau  conf &lt; τ</div>
+  <p>Sumber feedback: tool result, environment feedback, user/manager feedback, model evaluation.</p>
+
+  <h3>3.9 dan 3.10 Jenis agen menurut tugas</h3>
+  <div class="tbl"><table>
+    <tr><th>Agen</th><th>Fokus</th></tr>
+    <tr><td>Conversational</td><td>Intent detection, RAG, contextual memory, action-oriented</td></tr>
+    <tr><td>Research</td><td>Decompose → Search & Retrieve → Evaluate & Compare → Synthesize & Cite</td></tr>
+    <tr><td>Analytical</td><td>SQL generation, statistik deskriptif, forecasting & anomaly, visualisasi</td></tr>
+    <tr><td>Decision</td><td>Evidence + constraint → ranking / rekomendasi</td></tr>
+    <tr><td>Operational</td><td>Tugas berulang: order fulfillment, tiket, inventory update, scheduling</td></tr>
+    <tr><td>Coding</td><td>Generate, debug, test, CI/CD, dokumentasi di sandbox/repo</td></tr>
+  </table></div>
+  <div class="tbl"><table>
+    <tr><th>Tipe</th><th>Risiko</th><th>Dampak</th><th>Pengawasan</th></tr>
+    <tr><td>Decision</td><td>Tinggi</td><td>Strategis</td><td>Wajib approval</td></tr>
+    <tr><td>Operational</td><td>Sedang</td><td>Operasional</td><td>Monitoring rutin</td></tr>
+    <tr><td>Coding</td><td>Tinggi</td><td>Teknis</td><td>Review & testing</td></tr>
+  </table></div>
+  <div class="f">risk_score = wᵀx
+autonomy = 1[ risk &lt; ρ  dan  conf &gt; τ  dan  authority = 1 ]</div>
+
+  <h3>3.11 Studi kasus: seleksi dan persetujuan supplier</h3>
+  <p>Masalah: supplier banyak, kriteria kompleks, evaluasi manual, risiko compliance, approval lama. Goal: evaluate, verify, rank, explain, approve/escalate. Ini <b>constrained multi-criteria decision problem</b>: alternatif harus feasible dulu, baru diberi skor.</p>
+  <div class="tbl"><table>
+    <tr><th>Supplier</th><th>Cost</th><th>Quality</th><th>OTIF</th><th>Risk</th><th>Compliance</th></tr>
+    <tr><td>A</td><td class="n">540</td><td class="n">92</td><td class="n">96</td><td class="n">18</td><td>Y</td></tr>
+    <tr><td>B</td><td class="n">525</td><td class="n">89</td><td class="n">94</td><td class="n">24</td><td>Y</td></tr>
+    <tr><td>C</td><td class="n">548</td><td class="n">95</td><td class="n">90</td><td class="n">15</td><td>Y</td></tr>
+    <tr><td>D</td><td class="n">520</td><td class="n">87</td><td class="n">88</td><td class="n">30</td><td>N → gugur di filter policy</td></tr>
+  </table></div>
+  <div class="hafal"><span class="eyebrow">Urutan langkah</span><br><strong>Normalize → Weight → Filter Policy → Rank</strong></div>
+  <div class="f">Benefit (makin besar makin baik):  r_ij = x_ij / max_i x_ij
+Cost    (makin kecil makin baik):  r_ij = min_i x_ij / x_ij
+Weighted score:   z = 100 · R w
+Risiko (ML):      p_i = σ(β0 + βᵀ f_i)
+Hybrid final:     h_i = α·z_i + (1 − α)·100·(1 − p_i)</div>
+  <p>Hasil di slide: A 0.89, B 0.84, C 0.73, jadi A dipilih. Arsitektur: LLM ekstrak dokumen penawaran → ML prediksi risiko → DSS hitung skor berbobot → policy engine blokir supplier tanpa sertifikat → UI dashboard untuk manajer. Risk rendah: recommend/auto-route. Risk tinggi atau nilai besar: human approval/escalate. Override manajer jadi feedback untuk learning.</p>
+  <p>KPI: decision cycle time turun 60%, supplier quality naik 15%, cost saving naik 10%, override rate di bawah 5%.</p>
+
+  <div class="rawan"><span class="eyebrow">Rawan keluar</span>
+  <ul>
+    <li>Jelaskan BDI dengan contoh bisnis sendiri.</li>
+    <li>Tulis A = &lt;G,B,I,M,C,R,P,T&gt; dan arti tiap huruf.</li>
+    <li>Rumus normalisasi benefit vs cost (jangan terbalik).</li>
+    <li>Memory vs context vs state.</li>
+    <li>Syarat berhenti execution loop.</li>
+  </ul></div>
+</section>
+
+<!-- BAB 4 -->
+<section class="bab" id="bab4">
+  <div class="bab-head"><span class="bab-no">BAB IV</span><h2>Intelligent multi-agent system</h2></div>
+  <p class="lead">MAS adalah kumpulan agen otonom yang berbagi lingkungan dan saling berinteraksi. Perilaku global muncul (emergent) dari interaksi lokal, bisa kooperatif, kompetitif, atau campuran.</p>
+
+  <div class="f">MAS = &lt;A, E, S, O, Act, C, Φ&gt;
+A agen · E environment · S state · O observation · Act action · C komunikasi · Φ aturan interaksi
+a_i = &lt;G_i, B_i, I_i, M_i, π_i&gt;     // goal, belief, intention, memory, policy π_i(a|s)</div>
+
+  <h3>Kenapa MAS penting</h3>
+  <div class="tbl"><table>
+    <tr><th>Alasan</th><th>Rumus</th><th>Contoh</th></tr>
+    <tr><td>Skalabilitas</td><td>Speedup(n) = T₁ / Tₙ;  η(n) = Speedup(n) / n</td><td>1.000 task: 100 s vs 29 s (4 agen) → speedup ≈ 3.45×</td></tr>
+    <tr><td>Robustness</td><td>R_sys = 1 − ∏(1 − Rᵢ)</td><td>3 agen Rᵢ = 0.90 → 1 − 0.1³ = 0.999</td></tr>
+    <tr><td>Cost trade-off</td><td>J = C_comp + C_comm + C_fail</td><td>MAS optimal menekan total biaya</td></tr>
+  </table></div>
+  <div class="f">Loop agen:   o_i,t = O_i(s_t)  →  a_i,t = π_i(o_i,t, m_i,t)
+Joint action a⃗_t = (a_1,t, ..., a_n,t);   s_t+1 = T(s_t, a⃗_t)</div>
+  <p>Contoh smart grid: net load 30 + 25 + 35 = 90 kW; G1 35 + G2 40 + baterai 15 = 90 → mismatch 0. Efisiensi dispatch 84% (konvensional) → 94% (MAS), respons 15 menit → &lt; 1 menit.</p>
+
+  <h3>Arsitektur MAS</h3>
+  <p>Topologi: graf G = (V, E); edge (i, j) berarti agen i dan j bisa berkomunikasi.</p>
+  <div class="tbl"><table>
+    <tr><th>Arsitektur</th><th>Kontrol</th><th>Robust</th><th>Komunikasi</th><th>Catatan</th></tr>
+    <tr><td>Centralized</td><td>High</td><td>Low</td><td>Medium</td><td>Coordinator pilih a⃗* = argmin J(s, a⃗). Konsisten, audit mudah, tapi bottleneck + single point of failure, fan-in O(n)</td></tr>
+    <tr><td>Decentralized</td><td>Distributed</td><td>High</td><td>High</td><td>Tiap agen putuskan lokal lewat consensus dengan tetangga. Fault tolerant, tapi konvergensi lebih rumit</td></tr>
+    <tr><td>Hybrid</td><td>Balanced</td><td>High</td><td>Medium</td><td>Hierarki lokal + koordinasi peer. β mengatur kuatnya keputusan pusat vs otonomi cluster</td></tr>
+  </table></div>
+  <ul>
+    <li>Centralized overload: 10 worker × 50 msg/s = 500 msg/s, kapasitas 400 → antrean tumbuh 100 msg/s.</li>
+    <li>Hybrid UAV: 4 cluster × 8 = 32 UAV. Pusat cuma terima 4 ringkasan, bukan 32 telemetry → bandwidth turun ≈ 87.5%.</li>
+    <li>Pilih leader UAV: ℓ* = argmax [0.5E + 0.3C + 0.2Q] (E baterai, C konektivitas, Q kualitas sensor). UAV1 = 0.83 jadi leader. Kalau leader gagal: re-elect.</li>
+    <li>Formasi: target 20 m, jarak aktual 15 m → e = −5 m; Δv = −k·e = −0.2 × (−5) = +1 m/s.</li>
+  </ul>
+
+  <h3>Komunikasi antar agen</h3>
+  <div class="two">
+    <div><h4>ACL</h4>Agent Communication Language. Struktur pesan: performative, sender, receiver, content. Performative: REQUEST, INFORM, PROPOSE, AGREE, REFUSE, CONFIRM.</div>
+    <div><h4>KQML</h4>Knowledge Query and Manipulation Language. Berbasis knowledge sharing. Performative: ask-if, tell, subscribe, reply.</div>
+  </div>
+  <div class="f">m = &lt;s, r, p, c, o, l, id, t&gt;
+sender, receiver, performative, content, ontology, language, conversation-id, timestamp
+
+C_comm = Σ ( L/B + τ )     // L ukuran pesan, B bandwidth, τ latency
+Contoh: 8 KB, 8 Mbps, τ = 20 ms → transfer ≈ 8 ms → total ≈ 28 ms/pesan</div>
+  <div class="tbl"><table>
+    <tr><th>Performative</th><th>Makna</th><th>Respons umum</th></tr>
+    <tr><td>REQUEST</td><td>Minta aksi</td><td>AGREE / REFUSE</td></tr>
+    <tr><td>INFORM</td><td>Beri fakta</td><td>CONFIRM</td></tr>
+    <tr><td>PROPOSE</td><td>Beri opsi/harga</td><td>ACCEPT / REJECT</td></tr>
+  </table></div>
+  <p><b>Ontologi</b>: kosakata bersama supaya dua agen tidak memberi arti berbeda. Bentuk triple (subject, predicate, object), misalnya (Order42, hasStatus, Paid). Semantic mapping: customer_id ≡ buyer_key diterima kalau sim ≥ θ (contoh 0.92 ≥ 0.85).</p>
+  <p><b>Protokol sebagai FSM</b>: P = (Q, Σ, δ, q₀, F). Urutan: REQUEST → AGREE → aksi → INFORM(done) → CONFIRM. Pakai timeout untuk retry/failover dan conversation-id untuk audit.</p>
+  <p><b>Smart home</b>: U = 0.5·U_comfort + 0.3·U_energy + 0.2·U_security. AC 23°C: 0.5(0.95) + 0.3(0.55) + 0.2(0.90) = 0.82 → terpilih.</p>
+
+  <h3>Kolaborasi, koordinasi, negosiasi</h3>
+  <div class="tbl"><table>
+    <tr><th>Aspek</th><th>Kolaborasi</th><th>Koordinasi</th><th>Negosiasi</th></tr>
+    <tr><td>Konsep</td><td>Kerja sama untuk tujuan bersama</td><td>Sinkronisasi supaya tidak bentrok</td><td>Tawar-menawar antar kepentingan berbeda</td></tr>
+    <tr><td>Contoh</td><td>Universitas berbagi database riset obat</td><td>Thermostat, Energy, Security agent di smart home</td><td>Penjual A dan B bersaing harga lewat lelang</td></tr>
+  </table></div>
+  <div class="tbl"><table>
+    <tr><th>Tipe koordinasi</th><th>Rumus</th><th>Arti</th></tr>
+    <tr><td>Cooperative</td><td>a⃗* = argmax Σ Uᵢ(a⃗)</td><td>Maksimalkan kesejahteraan total. "Kita menang bersama"</td></tr>
+    <tr><td>Competitive (Nash)</td><td>Uᵢ(aᵢ*, a₋ᵢ*) ≥ Uᵢ(aᵢ, a₋ᵢ*)</td><td>Tidak ada agen yang untung kalau menyimpang sendirian</td></tr>
+    <tr><td>Mixed-motive</td><td>Negosiasi, insentif, trust</td><td>Sebagian tujuan sama, sebagian konflik</td></tr>
+    <tr><td>Fairness (Jain)</td><td>(Σxᵢ)² / (n·Σxᵢ²)</td><td>1 = sangat adil; mendekati 1/n = timpang</td></tr>
+    <tr><td>Joint reward</td><td>R_team = Σ wᵢ rᵢ</td><td>Bobot sesuai prioritas peran</td></tr>
+  </table></div>
+  <div class="f">Consensus:  x(k+1) = W x(k)      // W row-stochastic
+x(0) = [10, 20, 30] → x(1) = [15, 20, 25] → x(2) = [17.5, 20, 22.5]  → menuju rata-rata 20
+W = [[0.5, 0.5, 0], [0.25, 0.5, 0.25], [0, 0.5, 0.5]]
+Berhenti saat max(x) − min(x) &lt; ε.  Range turun 20 → 10 → 5</div>
+
+  <h3>Negosiasi</h3>
+  <div class="hafal"><span class="eyebrow">6 jenis negosiasi · "BMA-CCA"</span><br><strong>Bilateral · Multilateral · Auction · Contract Net · Coalition · Argumentation</strong><br>Protokol: propose → counter-offer → accept/reject → commit. Evaluasi: surplus, fairness, efisiensi.</div>
+  <ul>
+    <li><b>Supply chain</b>: S1 (10/unit, 2 hari, kap 100), S2 (9, 4 hari, 120), S3 (11, 1 hari, 80). Butuh 150 unit, SLA ≤ 2 hari. S1+S2 = 1.450 tapi &gt; 2 hari → tolak. S1 100 + S3 50 = 1.000 + 550 = <b>1.550</b> → terima.</li>
+    <li><b>E-commerce (time-dependent concession)</b>: p_B(t) = p_B⁰ + (p_B^max − p_B⁰)(t/T)^β. Ronde 98/108 → 101/105 → 103/103 deal. Surplus total (108 − 96) × 50 = 600; buyer (108 − 103) × 50 = 250; seller (103 − 96) × 50 = 350.</li>
+    <li><b>Nash Bargaining</b>: x* = argmax ∏ [Uᵢ(x) − dᵢ], dᵢ = disagreement utility. Harga 90 → 0.8 × 0.2 = 0.16; 100 → 0.6 × 0.4 = 0.24; 110 → 0.24; 120 → 0.16. Titik adil di 100-110.</li>
+  </ul>
+
+  <h3>Model lelang</h3>
+  <div class="two">
+    <div><h4>English auction (naik)</h4>p(t+1) = p(t) + Δp. Agen bertahan selama p ≤ vᵢ. Pemenang = penawar terakhir yang tersisa.</div>
+    <div><h4>Dutch auction (turun)</h4>p(t+1) = p(t) − Δp sampai ada agen pertama yang accept. Cepat, strategi timing penting.</div>
+  </div>
+  <p>Contoh English: reserve 90, Δp = 5, A = 105, B = 120, C = 112. A keluar setelah harga &gt; 105, C keluar setelah &gt; 112, <b>B menang</b> di sekitar 115-120. Dipakai di resource market: cloud, iklan digital, logistik.</p>
+
+  <h3>Contract Net Protocol (CNP)</h3>
+  <p>Diperkenalkan <b>R.G. Smith, 1978</b>. Manager mengumumkan task lewat <b>Call for Proposals (CFP)</b>, contractor menawar, proposal terbaik dapat award. Desentralisasi, fleksibel, scalable, tahan gagal (kalau pemenang gagal, task diumumkan ulang).</p>
+  <div class="f">score_i = 0.5·C_i + 0.3·T_i + 0.2·R_i    (C cost-quality, T timeliness, R reliability)
+A1 = 0.79   A2 = 0.80   A3 = 0.78   → pemenang A2</div>
+
+  <h3>Utility function</h3>
+  <div class="f">U_i(o) = Σ_k w_ik · f_k(o),   Σ w = 1
+w = [0.5, 0.3, 0.2]:  O1 = 0.78, O2 = 0.78, O3 = 0.8·0.5 + 0.8·0.3 + 0.9·0.2 = 0.82 → pilih O3
+Expected utility:  EU(a) = Σ_s P(s|a) · U(a, s)</div>
+  <p>Payoff matrix: accept-accept = (4, 4), outcome paling baik bersama (Pareto-better).</p>
+
+  <h3>Task allocation dan resource sharing</h3>
+  <p>Allocator/Orchestrator agent memecah instruksi besar jadi subtugas dan membaginya. Kriteria: skill, biaya, waktu, lokasi, kapasitas, risiko. Constraint: deadline, precedence, kapasitas. Objective: minimize cost/makespan. Feedback: re-allocate kalau overload/gagal.</p>
+  <div class="f">min Σ_i Σ_j c_ij x_ij
+s.t.  Σ_i x_ij = 1  (tiap task tepat satu agen);  Σ_j r_j x_ij ≤ cap_i;  x_ij ∈ {0,1}
+
+C = [[6,3,7],[4,8,5],[7,6,2]]  (baris agen, kolom task)
+T1→A2 (4), T2→A1 (3), T3→A3 (2)  → total minimum = 9</div>
+  <p>Cloud: job butuh 6 CPU + 12 GB. N1 (4 CPU) dan N3 (2 CPU) tidak cukup, jadi pilih N2 (8 CPU, 0.70/jam). Agen: Compute, Storage, Network, Broker.</p>
+
+  <h3>Learning dalam MAS</h3>
+  <p>Distributed RL: tiap agen punya Q(s, a) sendiri, reward bisa lokal atau global. Markov Game MG = &lt;N, S, {Aᵢ}, P, {Rᵢ}, γ&gt;.</p>
+  <div class="hafal"><span class="eyebrow">4 tantangan MARL</span><br><strong>Credit assignment · Partial observability · Non-stationarity · Communication learning</strong><br>Non-stationary karena policy agen lain juga berubah. Difference reward Dᵢ = G(z) − G(z₋ᵢ) mengukur kontribusi agen i.</div>
+  <p>Cooperative learning: Cooperative Q-Learning, Federated RL, Consensus-based Learning, Team-based Policy Gradient.</p>
+  <div class="f">Federated averaging:  θ̄ = Σ (nᵢ/N) θᵢ
+n = [100, 200, 100], θ = [0.80, 1.10, 0.95] → θ̄ = 0.25·0.80 + 0.50·1.10 + 0.25·0.95 = 0.9875
+
+Q-learning:  Q(s,a) ← Q(s,a) + α [ r + γ max Q(s',a') − Q(s,a) ]
+Q = 2, α = 0.2, r = 5, γ = 0.9, maxQ' = 4
+target = 5 + 0.9·4 = 8.6;  TD error = 6.6;  Q_new = 2 + 0.2·6.6 = 3.32</div>
+  <p>ε-greedy: eksplorasi (aksi acak dengan peluang ε) vs eksploitasi (pilih Q tertinggi). α = learning rate (seberapa cepat lupa ilmu lama), γ = discount factor (seberapa peduli jangka panjang). Contoh reward: Inventory Agent sukses cegah stockout +20, Logistics Agent telat −15.</p>
+
+  <h3>Security dan trust</h3>
+  <p>Security = melindungi MAS dari serangan dan mencegah aksi ekstrem. Trust = keyakinan manusia bahwa keputusan agen valid, etis, explainable. Cara: Safe RL (guardrail, misal harga maks ±15% per hari), enkripsi & autentikasi, audit Q-table, human-in-the-loop untuk order tidak wajar.</p>
+  <div class="tbl"><table>
+    <tr><th>Security goal</th><th>Pertanyaan</th></tr>
+    <tr><td>Authentication</td><td>Siapa agen sebenarnya?</td></tr>
+    <tr><td>Authorization</td><td>Aksi apa yang boleh? (action ∈ Capᵢ)</td></tr>
+    <tr><td>Integrity</td><td>Apakah pesan diubah?</td></tr>
+    <tr><td>Availability</td><td>Apakah layanan tetap jalan?</td></tr>
+  </table></div>
+  <p>Ancaman: spoofing, replay, malicious tool invocation, poisoned knowledge/model, Sybil identities.</p>
+  <div class="f">Risk = P(threat) × Impact
+Spoof 0.2×5 = 1.0   Replay 0.4×3 = 1.2 (tertinggi)   Tool abuse 0.15×5 = 0.75
+
+c = Enc_K(m);  σ = Sign_SK(H(m));  terima jika nonce ∉ Seen  dan  |t_now − t_msg| &lt; Δ
+Latency E2E: encrypt 2 + network 20 + decrypt&amp;verify 5 = 27 ms
+
+Trust:  T_ij(t+1) = λ·T_ij(t) + (1 − λ)·q_j(t),   λ = 0.8
+A2: 0.8·0.90 + 0.2·1.0 = 0.92   A3: 0.8·0.80 + 0.2·0.3 = 0.70   A4: 0.8·0.65 + 0.2·0.9 = 0.70
+Trusted ≥ 0.80 · Conditional 0.60-0.80 · Blocked &lt; 0.60
+Reputation:  Rep_j = Σ w_i T_ij / Σ w_i</div>
+  <p>Migrasi mobile agent: migrate hanya jika T_host ≥ 0.80 dan risk ≤ 0.20 dan state terverifikasi. E1 (0.92, risk 0.10) primary, E2 (0.68) ditolak walau lebih cepat, E3 (0.84, 0.15) backup. Prinsip: <b>security first, baru optimasi latency</b>.</p>
+
+  <h3>Interoperabilitas</h3>
+  <div class="hafal"><span class="eyebrow">4 lapis interoperabilitas · "SSPO"</span><br><strong>Syntactic (JSON/XML/protobuf) · Semantic (ontologi) · Protocol (request/reply, pub-sub) · Operational (API, identity, SLA)</strong></div>
+  <div class="f">I = &lt;Schema, Semantics, Protocol, Auth, QoS&gt;
+Unit adapter: T_F = 9/5 · T_C + 32  → 30°C = 86°F
+CPS:  x(t+1) = f(x_t, u_t, w_t);   o_i,t = h_i(x_t) + v_i,t
+L_e2e = L_edge + L_net + L_cloud + L_agent = 8 + 12 + 25 + 15 = 60 ms
+OEE = Availability × Performance × Quality</div>
+
+  <h3>Studi kasus implementasi</h3>
+  <div class="tbl"><table>
+    <tr><th>Domain</th><th>Peran agen</th><th>Algoritma inti</th><th>Angka kunci</th></tr>
+    <tr><td>Smart grid</td><td>Forecast, prosumer, storage, market, grid safety</td><td>Optimisasi + consensus</td><td>D = 120: G1 50 + G2 55 + baterai 15, mismatch 0</td></tr>
+    <tr><td>Supply chain</td><td>Demand, procurement, supplier, warehouse, logistics, finance</td><td>Auction + CNP</td><td>Delay: S1 500 + penalti 300 = 800 vs S2 550 → pilih S2</td></tr>
+    <tr><td>UAV swarm</td><td>Leader + peers</td><td>Formation + consensus</td><td>e = −3 m, k = 0.2 → koreksi 0.6 m/s</td></tr>
+    <tr><td>Healthcare</td><td>Triage, bed, doctor, pharmacy, care coordinator</td><td>Utility + constraint</td><td>P = 0.45S + 0.25R + 0.20W + 0.10C; P1 = 0.735 didahulukan</td></tr>
+    <tr><td>Smart manufacturing</td><td>Machine, order, maintenance, AGV</td><td>Negotiated scheduling</td><td>Makespan = 9</td></tr>
+  </table></div>
+  <p>Prinsip penting: multi-agent bukan sekadar banyak chatbot. Harus ada autonomy, interaction, coordination, dan joint system behavior.</p>
+
+  <div class="rawan"><span class="eyebrow">Rawan keluar (bab paling berat, paling banyak hitungan)</span>
+  <ul>
+    <li>Bandingkan centralized, decentralized, hybrid.</li>
+    <li>Hitung Q-learning, trust update, utility berbobot, consensus, assignment, federated averaging, speedup, reliability.</li>
+    <li>Jalannya English auction dan CNP.</li>
+    <li>ACL vs KQML, struktur pesan 8 elemen.</li>
+    <li>Tantangan MARL dan kenapa non-stationary.</li>
+  </ul></div>
+</section>
+
+<!-- BAB 5 -->
+<section class="bab" id="bab5">
+  <div class="bab-head"><span class="bab-no">BAB V</span><h2>Intelligent mobile agent system</h2></div>
+  <p class="lead">Mobile agent bisa berpindah antar host sambil membawa <b>kode dan state eksekusinya</b>. Komputasi mendekati data, sehingga komunikasi dan latency berkurang.</p>
+
+  <div class="tbl"><table>
+    <tr><th>Static agent</th><th>Mobile agent</th><th>Multi-agent system</th></tr>
+    <tr><td>Menetap di satu host, data dikirim ke agen</td><td>Pindah host membawa kode + state</td><td>Banyak agen berkoordinasi, eksekusi umumnya terikat node</td></tr>
+  </table></div>
+  <p>Transisi ke mobile menambah: <b>Mobility, Autonomy, Adaptation, Context, Security</b>. Manfaat: efisiensi (eksekusi dekat resource), skalabilitas, fleksibilitas, resilience (pindah ke node yang lebih ringan saat server pusat overload).</p>
+  <p>Contoh logistik: <b>Broker Agent</b> statis membagi tugas, <b>Worker Agent</b> mobile pindah ke node IoT truk, <b>Scout Agent</b> mobile cek inventori gudang, <b>Security Agent</b> statis memvalidasi izin sebelum migrasi.</p>
+  <div class="f">A = {a1, ..., an}   (agen)        H = {h1, ..., hm}   (host)
+M : A × H → H,   M(a_i, h_j) = h_k        // fungsi migrasi
+σ(a_i) = memory, task progress, parameter, context
+Exec(a_i, h_k, σ) melanjutkan komputasi setelah state dipulihkan
+Migrasi dipilih hanya jika meningkatkan utility tujuan agen</div>
+
+  <h3>Protokol migrasi</h3>
+  <p>Serialization = mengubah state jadi format yang bisa dikirim lewat jaringan; di host tujuan di-deserialize lalu lanjut tanpa kehilangan konteks. Protokol mengatur handshake, verifikasi, dan recovery.</p>
+  <div class="hafal"><span class="eyebrow">Urutan migrasi · "Fery Sering Antar Teh Rasa"</span><br><strong>Freeze → Serialize → Authenticate → Transfer → Restore & Resume</strong><br>Freeze: hentikan di safe checkpoint · Serialize: state, code reference, context jadi payload · Authenticate: validasi signature, policy, quota, trust host · Transfer: lewat kanal aman · Restore: pulihkan lalu resume.</div>
+  <p>Contoh bank digital: agen membawa state transaksi terenkripsi ke node pemrosesan yang paling relevan (bandingkan latency, load, compliance zone, availability), validasi ledger dan duplikat, lalu kembalikan log audit + hash ke pusat.</p>
+
+  <h3>Arsitektur modern (5 modul)</h3>
+  <div class="hafal"><span class="eyebrow">C = {core, migration, security, comm, knowledge}</span><br><strong>"CoMiSeCoKn"</strong> · Agent Core (reasoning, planning, policy) · Migration (capture, serialize, transfer, restore, rollback) · Security (identity, sandbox, encryption, audit) · Communication (message bus, API, event) · Knowledge (LLM, RAG, vector memory)</div>
+  <ul>
+    <li>Core tidak boleh punya hak sistem lebih luas dari policy sandbox.</li>
+    <li>Tiap modul punya interface eksplisit, bisa diuji dan diganti mandiri.</li>
+    <li>Knowledge layer dipisah dari credential dan data sensitif.</li>
+  </ul>
+  <div class="flow">Alur: observe → reason → authorize → migrate/act → monitor → learn</div>
+  <p>Security: identity, least privilege (per task, per host, sesingkat mungkin), sandbox (batasi CPU, memory, filesystem, network, tool), encryption (in-transit dan at-rest). Sandbox melindungi host dari agen jahat <b>dan</b> agen dari host jahat.</p>
+  <p>Contoh telco: Observe (latency, packet loss) → Predict (ML prediksi congestion/churn) → Move (pindah ke node relevan) → Diagnose (LLM + RAG pakai runbook).</p>
+
+  <h3>ML dan DL di mobile agent</h3>
+  <p>ML untuk klasifikasi, ranking, anomaly score, keputusan ringan. DL untuk pola kompleks (image, sequence, log, sensor). Edge inference menghemat bandwidth. RL cocok untuk mobilitas adaptif, CNN/RNN untuk data sensor atau perilaku user.</p>
+  <p>Pemilihan model: ukuran model, energi, latency (budget &lt; 50 ms), akurasi. Quantization/distillation menurunkan footprint.</p>
+  <div class="flow">Collect → Preprocess → Model/Inference → Agent decision (migrasi, eksekusi, rekomendasi) → feedback</div>
+  <div class="f">Backpropagation:
+1 forward: ŷ = f(x; θ)   2 loss: L(y, ŷ)   3 output gradient: ∂L/∂ŷ
+4 backprop (chain rule): ∂L/∂θ   5 update: θ ← θ − η∇θL   6 ulangi sampai validation loss stabil</div>
+  <p>E-commerce agent: Observe (clickstream) → Feature (recency, frequency, basket value) → Predict P(y=1|x) → Act & Learn.</p>
+
+  <h3>RL untuk mobilitas adaptif</h3>
+  <div class="f">State   s = &lt;latency, CPU/GPU, queue, bandwidth, trust, locality&gt;
+Action  a ∈ {stay, migrate(h1), ..., migrate(hm), defer}
+Reward  r = success − λ1·latency − λ2·cost − λ3·risk
+Policy  π(a|s);  Transition P(s'|s,a)
+Objective: maksimalkan E[Σ γ^t r_t] sambil memenuhi SLA dan security policy</div>
+  <p>MDP: tiap host = state, perpindahan = action, reward = hasil keputusan migrasi.</p>
+  <div class="f">Contoh 2 (slide bab 5):
+Q(S1,A1) = 5, r = 10, maxQ(S2) = 7, α = 0.5, γ = 0.9
+target = 10 + 0.9·7 = 16.3;  selisih = 16.3 − 5 = 11.3;  0.5·11.3 = 5.65;  Q_new = 10.65</div>
+
+  <h3>LLM sebagai reasoning engine</h3>
+  <p>Lima peran LLM: <b>Understand, Plan, Reason, Explain, Communicate</b>. Attention mechanism (inti Transformer) menghitung relevansi Query terhadap Key lalu mengagregasi Value menjadi representasi konteks, sehingga agen bisa menyorot baris log atau sensor yang penting.</p>
+  <p><b>Context engineering</b>: kemas Goal & instruction, Current state, Memory (ringkas, jangan semua log), Telemetry (latency, load, cost, security posture), Evidence (top-k RAG + source ID), Policy (ACL, compliance, budget, approval gate).</p>
+  <p>Contoh analisis log: migrasi ke server log → ambil error dan performa → LLM + attention sorot baris kritis → reasoning: overload, salah konfigurasi, atau serangan → kirim rekomendasi ke pusat.</p>
+
+  <h3>RAG</h3>
+  <div class="flow">Query → Retrieve → Augment → Generate</div>
+  <p>Strategi retrieval enterprise: <b>dense</b> (vector embedding, semantik), <b>hybrid</b> (keyword + semantic), <b>domain-specific indexing</b> (log transaksi, arsip klaim, dokumen hukum).</p>
+  <div class="f">Retrieve_k(t) = arg top-k sim( e(t), e(k_i) )
+e(·) fungsi embedding;   Knowledge base K = {k1, k2, ..., kn}</div>
+  <p>Smart claim asuransi kendaraan: Intake → Retrieve (vector + keyword dengan filter ACL) → Reasoning (LLM) → Validasi terhadap polis → Decode (keputusan klaim).</p>
+
+  <h3>GNN untuk jaringan agen</h3>
+  <p>Node = host, agent platform, device, service. Edge = koneksi, dependency, jalur migrasi. Feature node: load, latency, trust, error rate, traffic, security signal.</p>
+  <div class="f">G = (V, E);  tiap node v_i punya fitur h_i
+Message passing:  h_i' = σ( Σ_{j ∈ N(i)} W·h_j + b )</div>
+  <p>Deteksi anomali: Graph Construction → Message Passing → Anomaly Detection → Alert & Analysis. Insight: <b>topology matters</b> (pakai GNN kalau risiko bergantung pada jalur koneksi), dynamic graph (time-window, incremental update), explainability (simpan subgraph evidence sebelum aksi kritis).</p>
+
+  <h3>MIMA (Multiple Intelligent Mobile Agents)</h3>
+  <p>Beberapa agen cerdas mobile yang berpindah antar host dan berkomunikasi untuk tujuan bersama. Keunggulan: skalabilitas tinggi, adaptif, efisien lewat koordinasi, cocok untuk logistik, asuransi, IoT, cybersecurity.</p>
+  <div class="tbl"><table>
+    <tr><th>Mode</th><th>Arti</th></tr>
+    <tr><td>Competitive</td><td>Bersaing atas resource terbatas; alokasi lewat bid, utility, policy</td></tr>
+    <tr><td>Negotiated</td><td>Broker/manager menyelaraskan capability, SLA, trust, locality, cost</td></tr>
+    <tr><td>Hybrid</td><td>Sebagian task bersama, resource tertentu dinegosiasikan</td></tr>
+    <tr><td>Cooperative</td><td>Berbagi data, task, hasil untuk objective bersama</td></tr>
+  </table></div>
+  <div class="hafal"><span class="eyebrow">4 peran MIMA · "SBWS"</span><br><strong>Scout</strong> (kumpulkan data, sensing) · <strong>Broker</strong> (matching & alokasi resource) · <strong>Worker</strong> (eksekusi & lapor) · <strong>Security</strong> (policy & compliance)</div>
+  <p>Hasil studi kasus logistik: pengiriman 25% lebih cepat, beban server merata, keamanan data naik lewat validasi multi-lapis Security Agent.</p>
+
+  <div class="rawan"><span class="eyebrow">Rawan keluar</span>
+  <ul>
+    <li>Beda static agent, mobile agent, dan MAS.</li>
+    <li>Fungsi migrasi M: A × H → H dan urutan protokol migrasi.</li>
+    <li>Rumus reward RL untuk migrasi dan isi state/action.</li>
+    <li>Rumus RAG top-k dan message passing GNN.</li>
+    <li>Peran Scout, Broker, Worker, Security.</li>
+  </ul></div>
+</section>
+
+<!-- LEMBAR RUMUS -->
+<section class="bab" id="rumus">
+  <div class="bab-head"><span class="bab-no">RUMUS</span><h2>Lembar rumus satu tempat</h2></div>
+  <p class="lead">Close book berarti rumus harus di kepala. Tulis ulang tabel ini dua sampai tiga kali di kertas kosong.</p>
+  <div class="tbl"><table>
+    <tr><th>Nama</th><th>Rumus</th><th>Bab</th></tr>
+    <tr><td>Agen tunggal</td><td class="mono">A = &lt;G,B,I,M,C,R,P,T&gt;; s(t+1) = F(s,o,a)</td><td>3</td></tr>
+    <tr><td>Aksi optimal</td><td class="mono">a* = argmax_a U(a|s,g,c) s.t. policy(a)=1</td><td>3</td></tr>
+    <tr><td>Logistic score</td><td class="mono">p = σ(wᵀx + b); expedite jika p &gt; τ</td><td>3</td></tr>
+    <tr><td>Cosine similarity</td><td class="mono">sim(q,m) = qᵀm / (‖q‖‖m‖)</td><td>3</td></tr>
+    <tr><td>Pilih tool</td><td class="mono">t* = argmax P(t|intent,context); jalan jika auth=1</td><td>3</td></tr>
+    <tr><td>Stop loop</td><td class="mono">goal=1 ∨ steps&gt;K ∨ cost&gt;B ∨ conf&lt;τ</td><td>3</td></tr>
+    <tr><td>Normalisasi</td><td class="mono">benefit x/max; cost min/x; z = 100Rw</td><td>3</td></tr>
+    <tr><td>Hybrid score</td><td class="mono">h = αz + (1−α)·100(1−p)</td><td>3</td></tr>
+    <tr><td>Otonomi</td><td class="mono">1[risk&lt;ρ ∧ conf&gt;τ ∧ authority=1]</td><td>3</td></tr>
+    <tr><td>MAS</td><td class="mono">&lt;A,E,S,O,Act,C,Φ&gt;; a_i = &lt;G,B,I,M,π&gt;</td><td>4</td></tr>
+    <tr><td>Speedup</td><td class="mono">T₁/Tₙ; η = Speedup/n</td><td>4</td></tr>
+    <tr><td>Reliability</td><td class="mono">R_sys = 1 − ∏(1 − Rᵢ)</td><td>4</td></tr>
+    <tr><td>Biaya total</td><td class="mono">J = C_comp + C_comm + C_fail</td><td>4</td></tr>
+    <tr><td>Biaya komunikasi</td><td class="mono">C_comm = Σ(L/B + τ)</td><td>4</td></tr>
+    <tr><td>Pesan ACL</td><td class="mono">m = &lt;s,r,p,c,o,l,id,t&gt;</td><td>4</td></tr>
+    <tr><td>FSM protokol</td><td class="mono">P = (Q, Σ, δ, q₀, F)</td><td>4</td></tr>
+    <tr><td>Consensus</td><td class="mono">x(k+1) = W x(k)</td><td>4</td></tr>
+    <tr><td>Kooperatif</td><td class="mono">argmax Σ Uᵢ</td><td>4</td></tr>
+    <tr><td>Nash equilibrium</td><td class="mono">Uᵢ(aᵢ*,a₋ᵢ*) ≥ Uᵢ(aᵢ,a₋ᵢ*)</td><td>4</td></tr>
+    <tr><td>Jain fairness</td><td class="mono">(Σx)² / (nΣx²)</td><td>4</td></tr>
+    <tr><td>Nash bargaining</td><td class="mono">argmax ∏ [Uᵢ(x) − dᵢ]</td><td>4</td></tr>
+    <tr><td>Konsesi</td><td class="mono">p_B(t) = p⁰ + (p^max − p⁰)(t/T)^β</td><td>4</td></tr>
+    <tr><td>English / Dutch</td><td class="mono">p ± Δp; bid jika p ≤ v</td><td>4</td></tr>
+    <tr><td>CNP score</td><td class="mono">0.5C + 0.3T + 0.2R</td><td>4</td></tr>
+    <tr><td>Utility berbobot</td><td class="mono">U = Σ w_k f_k; EU = Σ P(s|a)U</td><td>4</td></tr>
+    <tr><td>Assignment</td><td class="mono">min ΣΣ c_ij x_ij; Σ_i x_ij = 1</td><td>4</td></tr>
+    <tr><td>Markov game</td><td class="mono">&lt;N,S,{Aᵢ},P,{Rᵢ},γ&gt;</td><td>4</td></tr>
+    <tr><td>Difference reward</td><td class="mono">Dᵢ = G(z) − G(z₋ᵢ)</td><td>4</td></tr>
+    <tr><td>Federated</td><td class="mono">θ̄ = Σ (nᵢ/N) θᵢ</td><td>4</td></tr>
+    <tr><td>Q-learning</td><td class="mono">Q ← Q + α[r + γ max Q' − Q]</td><td>4, 5</td></tr>
+    <tr><td>Risk</td><td class="mono">P(threat) × Impact</td><td>4</td></tr>
+    <tr><td>Trust</td><td class="mono">T(t+1) = λT(t) + (1−λ)q</td><td>4</td></tr>
+    <tr><td>Reputation</td><td class="mono">Σ wᵢTᵢⱼ / Σ wᵢ</td><td>4</td></tr>
+    <tr><td>Latency E2E</td><td class="mono">L_edge + L_net + L_cloud + L_agent</td><td>4</td></tr>
+    <tr><td>OEE</td><td class="mono">Availability × Performance × Quality</td><td>4</td></tr>
+    <tr><td>Migrasi</td><td class="mono">M: A × H → H</td><td>5</td></tr>
+    <tr><td>Reward migrasi</td><td class="mono">r = success − λ1·lat − λ2·cost − λ3·risk</td><td>5</td></tr>
+    <tr><td>Backprop update</td><td class="mono">θ ← θ − η∇θL</td><td>5</td></tr>
+    <tr><td>RAG top-k</td><td class="mono">arg top-k sim(e(t), e(kᵢ))</td><td>5</td></tr>
+    <tr><td>GNN</td><td class="mono">h_i' = σ(Σ_{j∈N(i)} W h_j + b)</td><td>5</td></tr>
+  </table></div>
+</section>
+
+<!-- LATIHAN -->
+<section class="bab" id="latihan">
+  <div class="bab-head"><span class="bab-no">LATIHAN</span><h2>Latihan hitung</h2></div>
+  <p class="lead">Kerjakan dulu di kertas, baru buka jawabannya. Soal 1-8 pakai angka dari slide, soal 9-12 angka baru supaya kamu benar-benar paham caranya.</p>
+
+  <details class="soal"><summary>1. Q-learning: Q = 2, α = 0.2, r = 5, γ = 0.9, max Q(s',a') = 4. Hitung Q baru.</summary>
+  <div class="ans">Target = 5 + 0.9 × 4 = 8.6. TD error = 8.6 − 2 = 6.6. Q baru = 2 + 0.2 × 6.6 = <b>3.32</b>.</div></details>
+
+  <details class="soal"><summary>2. Trust: λ = 0.8, T lama = 0.80, kualitas interaksi terbaru q = 0.3. Hitung T baru dan statusnya.</summary>
+  <div class="ans">T = 0.8 × 0.80 + 0.2 × 0.3 = 0.64 + 0.06 = <b>0.70</b>. Status conditional (0.60 ≤ T &lt; 0.80): boleh dipakai, tapi bukan pilihan pertama.</div></details>
+
+  <details class="soal"><summary>3. Reliability: 3 agen identik, masing-masing R = 0.90. Berapa R_sys?</summary>
+  <div class="ans">R_sys = 1 − (1 − 0.9)³ = 1 − 0.001 = <b>0.999</b>.</div></details>
+
+  <details class="soal"><summary>4. Speedup: single agent 100 s, 4 agen 29 s. Hitung speedup dan efisiensi paralel.</summary>
+  <div class="ans">Speedup = 100 / 29 ≈ <b>3.45×</b>. η = 3.45 / 4 ≈ <b>0.86</b> (makin dekat 1 makin efektif).</div></details>
+
+  <details class="soal"><summary>5. Consensus: x(0) = [10, 20, 30], W = [[0.5,0.5,0],[0.25,0.5,0.25],[0,0.5,0.5]]. Hitung x(1) dan x(2).</summary>
+  <div class="ans">x(1): 0.5·10 + 0.5·20 = 15; 0.25·10 + 0.5·20 + 0.25·30 = 20; 0.5·20 + 0.5·30 = 25 → <b>[15, 20, 25]</b>.<br>x(2): 0.5·15 + 0.5·20 = 17.5; 0.25·15 + 0.5·20 + 0.25·25 = 20; 0.5·20 + 0.5·25 = 22.5 → <b>[17.5, 20, 22.5]</b>. Menuju rata-rata 20.</div></details>
+
+  <details class="soal"><summary>6. CNP: score = 0.5C + 0.3T + 0.2R. A1 (0.80, 0.70, 0.90), A2 (0.70, 0.95, 0.85), A3 (0.90, 0.60, 0.75). Siapa menang?</summary>
+  <div class="ans">A1 = 0.40 + 0.21 + 0.18 = 0.79. A2 = 0.35 + 0.285 + 0.17 = 0.805 ≈ 0.80. A3 = 0.45 + 0.18 + 0.15 = 0.78. <b>A2 menang</b>.</div></details>
+
+  <details class="soal"><summary>7. Assignment: C = [[6,3,7],[4,8,5],[7,6,2]] (baris A1-A3, kolom T1-T3), satu agen satu task. Cari biaya minimum.</summary>
+  <div class="ans">T1→A2 (4), T2→A1 (3), T3→A3 (2). Total <b>9</b>. X = [[0,1,0],[1,0,0],[0,0,1]].</div></details>
+
+  <details class="soal"><summary>8. Negosiasi: reservation buyer 108, minimum seller 96, deal 103 untuk 50 unit. Hitung surplus.</summary>
+  <div class="ans">Total = (108 − 96) × 50 = <b>600</b>. Buyer = (108 − 103) × 50 = <b>250</b>. Seller = (103 − 96) × 50 = <b>350</b>.</div></details>
+
+  <details class="soal"><summary>9. (Angka baru) Q-learning: Q = 4, α = 0.1, r = 2, γ = 0.8, max Q' = 5.</summary>
+  <div class="ans">Target = 2 + 0.8 × 5 = 6. TD error = 6 − 4 = 2. Q baru = 4 + 0.1 × 2 = <b>4.2</b>.</div></details>
+
+  <details class="soal"><summary>10. (Angka baru) Federated: n = [50, 150], θ = [0.6, 1.0]. Hitung θ̄.</summary>
+  <div class="ans">N = 200. θ̄ = (50/200)·0.6 + (150/200)·1.0 = 0.15 + 0.75 = <b>0.90</b>.</div></details>
+
+  <details class="soal"><summary>11. (Angka baru) English auction: reserve 100, Δp = 10, valuasi A = 125, B = 140, C = 118. Siapa menang dan kira-kira di harga berapa?</summary>
+  <div class="ans">Harga 100 → 110 → 120: C keluar (120 &gt; 118). 130: A keluar (130 &gt; 125). <b>B menang</b> di sekitar 130 (di atas exit A, di bawah valuasi B 140).</div></details>
+
+  <details class="soal"><summary>12. (Angka baru) Jain fairness untuk alokasi x = [2, 2, 4].</summary>
+  <div class="ans">(Σx)² = 8² = 64. nΣx² = 3 × (4 + 4 + 16) = 72. Jain = 64/72 ≈ <b>0.89</b>. Cukup adil (1 = adil sempurna, 1/3 ≈ 0.33 = paling timpang).</div></details>
+</section>
+
+<!-- FLASHCARD -->
+<section class="bab" id="flash">
+  <div class="bab-head"><span class="bab-no">TES</span><h2>Flashcard hafalan</h2></div>
+  <p class="lead">Ketuk kartu untuk membalik. Tandai "Sudah hafal" supaya kartu itu tidak muncul lagi di mode "Belum hafal saja".</p>
+  <div class="fc">
+    <div class="fc-bar">
+      <label for="fcBab">Bab</label>
+      <select id="fcBab"><option value="0">Semua</option><option value="1">Bab 1</option><option value="2">Bab 2</option><option value="3">Bab 3</option><option value="4">Bab 4</option><option value="5">Bab 5</option></select>
+      <label for="fcMode">Tampilkan</label>
+      <select id="fcMode"><option value="all">Semua kartu</option><option value="todo">Belum hafal saja</option></select>
+      <button id="fcShuffle" type="button">Acak</button>
+    </div>
+    <div class="card" id="fcCard" role="button" tabindex="0" aria-live="polite">
+      <span class="side" id="fcSide">Pertanyaan</span>
+      <div class="txt" id="fcText"></div>
+    </div>
+    <div class="fc-bar">
+      <button id="fcPrev" type="button">Sebelumnya</button>
+      <button id="fcFlip" type="button">Balik</button>
+      <button id="fcNext" type="button">Berikutnya</button>
+      <button id="fcKnow" type="button" class="primary">Sudah hafal</button>
+    </div>
+    <div class="fc-stat" id="fcStat"></div>
+  </div>
+</section>
+
+<footer>Disusun dari slide Chapter 1-5 mata kuliah AI Agentic Technology Systems for Digital Enterprise Ecosystem (Prof. Dr. Azhari, MT, DIKE FMIPA UGM). Angka contoh mengikuti slide. Di slide smart home, nilai AC 26°C tertulis 0.78; kalau dihitung ulang hasilnya 0.80, tetap kalah dari AC 23°C (0.82).</footer>
+</div>
+
+<script>
+(function(){
+  var cards = [
+    {b:1,q:"Sebutkan 8 era evolusi AI berurutan.",a:"Traditional AI, Machine Learning, Deep Learning, Generative AI, AI Agents, Agentic AI, Multi-Agentic AI, Autonomous Enterprise."},
+    {b:1,q:"Kata kerja tiap era AI?",a:"Rules, Learn, Represent, Generate, Act, Plan, Collaborate, Autonomize."},
+    {b:1,q:"Tahun mulai Traditional AI, ML, dan DL?",a:"1956, 1959, 2006."},
+    {b:1,q:"Apa milestone Deep Blue?",a:"IBM, 1997. Mengalahkan juara catur dunia dalam 6 game. Search + evaluation function + hardware khusus."},
+    {b:1,q:"Apa milestone AlphaGo?",a:"2016. Mengalahkan Lee Sedol 4-1. Deep network + search + reinforcement learning."},
+    {b:1,q:"Rumus komponen AI Agent?",a:"Model + Instructions + Tools + Memory/State, dijaga guardrails, human handoff, observability."},
+    {b:1,q:"Loop AI agent?",a:"Perceive → Reason → Act → Observe → Update state/memory."},
+    {b:1,q:"Beda chatbot dan AI agent?",a:"Chatbot fokus percakapan, tool opsional, interaksi pendek. Agent fokus menyelesaikan task, tool inti, multi-step, punya task state, bisa retry/eskalasi.\nA chatbot talks. An agent gets work done."},
+    {b:1,q:"6 ciri Agentic AI?",a:"Goal-oriented, planning, tool orchestration, reflection, bounded autonomy, escalation."},
+    {b:1,q:"Level maturity L0 sampai L5?",a:"L0 Manual, L1 Rule Automation (RPA), L2 AI-Assisted (Copilot), L3 AI Agent, L4 Agentic Workflow, L5 Autonomous Domain Operations."},
+    {b:1,q:"A2A vs MCP?",a:"A2A: agen bicara ke agen lain (discovery, delegasi). MCP: agen tersambung ke tools, data, workflow."},
+    {b:1,q:"5 alasan memakai multi-agent?",a:"Specialization, parallelism, modularity, separation of authority, organizational mapping."},
+    {b:1,q:"Roadmap autonomous enterprise?",a:"Assist → Automate → Agentize → Orchestrate → Autonomize."},
+    {b:1,q:"3 lapisan operating model autonomous enterprise?",a:"Human governance layer, agentic work layer, digital enterprise layer."},
+    {b:1,q:"Predictive vs Generative: pola enterprise?",a:"Predictive: predict → trigger workflow. Generative: generate → validate → act."},
+    {b:2,q:"7 fondasi intelligent agent?",a:"Environment, Rationality, Goals, Perception, Action, Autonomy, Learning."},
+    {b:2,q:"4 dimensi karakteristik environment?",a:"Observability (fully/partially), outcome (deterministic/stochastic), change (static/dynamic), actors (single/multi-agent)."},
+    {b:2,q:"Environment enterprise biasanya seperti apa?",a:"Partially observable, stochastic, dynamic, multi-agent."},
+    {b:2,q:"Kenapa rationality ≠ omniscience?",a:"Rational = pilih aksi terbaik dengan informasi yang ada saat itu. Omniscience = tahu semua konsekuensi. Agen tetap rasional walau hasilnya buruk."},
+    {b:2,q:"4 faktor keputusan rasional?",a:"Performance measure, prior knowledge, percept history, available actions."},
+    {b:2,q:"PEAS singkatan dari?",a:"Performance, Environment, Actuators, Sensors."},
+    {b:2,q:"Goal-based vs utility-based vs multi-objective?",a:"Goal-based: satu target mutlak. Utility-based: pilih skor terbaik. Multi-objective: seimbangkan banyak parameter."},
+    {b:2,q:"Rumus pemilihan aksi dengan goal, utility, constraint?",a:"Choose action = maximize Utility subject to Goal + Constraints."},
+    {b:2,q:"Reactive vs deliberative?",a:"Reactive: stimulus → response, cepat, minim memori, kaku. Deliberative: model → plan → action, lebih lambat, kaya konteks, fleksibel. Hybrid menggabungkan keduanya."},
+    {b:2,q:"4 tingkat otonomi?",a:"Assist (saran), Approve (human-in-the-loop), Supervise (human-on-the-loop), Delegate (bounded autonomy)."},
+    {b:2,q:"4 komponen learning agent?",a:"Performance element (pilih aksi), learning element (perbarui), critic (nilai hasil), problem generator (eksplorasi)."},
+    {b:2,q:"Kenapa percept sequence penting?",a:"Memberi konteks waktu. Suhu 80°C bisa normal kalau stabil, tapi bahaya kalau naik cepat dari 55°C."},
+    {b:3,q:"BDI: arti B, D, I?",a:"Belief: apa yang diketahui. Desire: tujuan potensial. Intention: tujuan yang dipilih dan dikomitmenkan."},
+    {b:3,q:"Proses reasoning BDI?",a:"Observe → Update Belief → Generate Desire → Commit Intention → Execute → Learn."},
+    {b:3,q:"A = <G,B,I,M,C,R,P,T> artinya?",a:"Goal, Belief, Intention, Memory, Context, Reasoning, Planning, Tools."},
+    {b:3,q:"Kapan kecerdasan sejati muncul (bab 3)?",a:"Ketika Reasoning memakai Tools untuk mengubah Belief menjadi Action."},
+    {b:3,q:"Alur kognitif agen?",a:"Perceive → Understand → Reason → Plan → Intend & Act → Learn."},
+    {b:3,q:"Syarat aksi boleh dieksekusi?",a:"Authority, confidence, dan constraints terpenuhi. Dampak tinggi atau confidence rendah → human approval."},
+    {b:3,q:"4 kriteria memilih model AI?",a:"Akurasi & explainability, latency & cost, privasi & data, skalabilitas."},
+    {b:3,q:"4 pilar reliability agen produksi?",a:"Monitoring, tracing, recovery, audit trail."},
+    {b:3,q:"Memory vs context vs state?",a:"Memory: histori dan pengalaman. Context: situasi relevan saat ini. State: status internal runtime (aktif, idle, error)."},
+    {b:3,q:"4 jenis memory agen?",a:"Short-term, long-term, episodic, semantic."},
+    {b:3,q:"Tools vs functions vs APIs?",a:"Tools: modul untuk tugas tertentu. Functions: unit logika spesifik. APIs: antarmuka antar sistem."},
+    {b:3,q:"Prinsip pemakaian tool yang aman?",a:"Least privilege, tool allow-list, human-in-the-loop, audit trail."},
+    {b:3,q:"Kapan execution loop berhenti?",a:"goal = 1, atau steps > K, atau cost > B, atau conf < τ."},
+    {b:3,q:"Langkah research agent?",a:"Decompose → Search & Retrieve → Evaluate & Compare → Synthesize & Cite."},
+    {b:3,q:"Langkah seleksi supplier?",a:"Normalize → Weight → Filter Policy → Rank."},
+    {b:3,q:"Normalisasi benefit vs cost?",a:"Benefit: x / max x. Cost: min x / x."},
+    {b:3,q:"KPI agen seleksi supplier?",a:"Cycle time turun 60%, quality naik 15%, cost saving naik 10%, override rate < 5%."},
+    {b:4,q:"Tuple formal MAS?",a:"MAS = <A, E, S, O, Act, C, Φ>: agen, environment, state, observation, action, komunikasi, aturan interaksi."},
+    {b:4,q:"Centralized vs decentralized vs hybrid: kelemahan utama?",a:"Centralized: bottleneck + single point of failure. Decentralized: koordinasi dan konvergensi rumit. Hybrid: perlu atur β (pusat vs cluster)."},
+    {b:4,q:"ACL vs KQML?",a:"ACL: standar pesan dengan performative (REQUEST, INFORM, PROPOSE, AGREE, REFUSE). KQML: berbasis knowledge sharing (ask-if, tell, subscribe, reply)."},
+    {b:4,q:"8 elemen pesan formal?",a:"m = <s, r, p, c, o, l, id, t>: sender, receiver, performative, content, ontology, language, conversation-id, timestamp."},
+    {b:4,q:"Fungsi ontologi di MAS?",a:"Kosakata bersama supaya agen memberi arti yang sama pada pesan. Bentuk triple (subject, predicate, object)."},
+    {b:4,q:"Kolaborasi vs koordinasi vs negosiasi?",a:"Kolaborasi: kerja sama tujuan bersama. Koordinasi: sinkronisasi supaya tidak bentrok. Negosiasi: tawar-menawar kepentingan berbeda."},
+    {b:4,q:"6 jenis negosiasi MAS?",a:"Bilateral, multilateral, auction-based, contract net, coalition formation, argumentation-based."},
+    {b:4,q:"English vs Dutch auction?",a:"English: harga naik, pemenang penawar terakhir. Dutch: harga turun, pemenang yang pertama accept."},
+    {b:4,q:"Contract Net Protocol: siapa penemu dan alurnya?",a:"R.G. Smith, 1978. Manager kirim CFP → contractor bid → manager pilih skor terbaik → eksekusi → re-contract kalau gagal."},
+    {b:4,q:"Nash Bargaining Solution?",a:"x* = argmax ∏ [Ui(x) − di], di = disagreement utility."},
+    {b:4,q:"4 tantangan MARL?",a:"Credit assignment, partial observability, non-stationarity, communication learning."},
+    {b:4,q:"Kenapa environment MAS non-stationary?",a:"Karena policy agen lain juga ikut berubah selama belajar."},
+    {b:4,q:"Algoritma cooperative learning?",a:"Cooperative Q-Learning, Federated RL, Consensus-based Learning, Team-based Policy Gradient."},
+    {b:4,q:"Arti α dan γ di Q-learning?",a:"α learning rate: seberapa cepat ganti ilmu lama. γ discount factor: seberapa peduli reward jangka panjang."},
+    {b:4,q:"4 security goal agen?",a:"Authentication, authorization, integrity, availability."},
+    {b:4,q:"5 ancaman di threat model?",a:"Spoofing, replay, malicious tool invocation, poisoned knowledge/model, Sybil identities."},
+    {b:4,q:"Ambang trust?",a:"Trusted ≥ 0.80, conditional 0.60-0.80, blocked < 0.60."},
+    {b:4,q:"4 lapis interoperabilitas?",a:"Syntactic, semantic, protocol, operational."},
+    {b:5,q:"Beda static agent dan mobile agent?",a:"Static menetap di satu host, data dikirim ke agen. Mobile pindah host membawa kode + state eksekusi, komputasi mendekati data."},
+    {b:5,q:"Fungsi migrasi formal?",a:"M : A × H → H, M(ai, hj) = hk."},
+    {b:5,q:"Urutan protokol migrasi?",a:"Freeze → Serialize → Authenticate → Transfer → Restore & Resume."},
+    {b:5,q:"5 modul arsitektur mobile agent?",a:"Core, migration, security, communication, knowledge."},
+    {b:5,q:"Aturan pemisahan modul?",a:"Core tidak boleh punya hak lebih luas dari sandbox; tiap modul punya interface eksplisit; knowledge dipisah dari credential."},
+    {b:5,q:"4 elemen security mobile agent?",a:"Identity, least privilege, sandbox, encryption."},
+    {b:5,q:"State, action, reward RL migrasi?",a:"s = <latency, CPU/GPU, queue, bandwidth, trust, locality>. a ∈ {stay, migrate(h), defer}. r = success − λ1·latency − λ2·cost − λ3·risk."},
+    {b:5,q:"6 langkah backpropagation?",a:"Forward pass → loss → output gradient → backprop (chain rule) → update θ ← θ − η∇L → ulangi."},
+    {b:5,q:"5 peran LLM di mobile agent?",a:"Understand, plan, reason, explain, communicate."},
+    {b:5,q:"Isi context engineering?",a:"Goal & instruction, current state, memory, telemetry, evidence (top-k RAG), policy."},
+    {b:5,q:"Tahap RAG?",a:"Query → Retrieve → Augment → Generate."},
+    {b:5,q:"3 strategi retrieval enterprise?",a:"Dense retrieval, hybrid retrieval (keyword + semantic), domain-specific indexing."},
+    {b:5,q:"Rumus message passing GNN?",a:"hi' = σ( Σ_{j ∈ N(i)} W·hj + b )."},
+    {b:5,q:"Alur deteksi anomali GNN?",a:"Graph construction → message passing → anomaly detection → alert & analysis."},
+    {b:5,q:"4 mode MIMA?",a:"Competitive, negotiated, hybrid, cooperative."},
+    {b:5,q:"4 peran agen di MIMA?",a:"Scout (sensing data), Broker (matching & alokasi), Worker (eksekusi & lapor), Security (policy & compliance)."}
+  ];
+
+  var KEY = "uts-agentic-known";
+  var known = {};
+  try { known = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { known = {}; }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(known)); } catch(e) {} }
+
+  var babSel = document.getElementById("fcBab"), modeSel = document.getElementById("fcMode");
+  var card = document.getElementById("fcCard"), side = document.getElementById("fcSide"), txt = document.getElementById("fcText"), stat = document.getElementById("fcStat");
+  var knowBtn = document.getElementById("fcKnow");
+  var order = cards.map(function(_, i){ return i; });
+  var deck = [], pos = 0, flipped = false;
+
+  function build(){
+    var b = +babSel.value, todo = modeSel.value === "todo";
+    deck = order.filter(function(i){ return (b === 0 || cards[i].b === b) && (!todo || !known[i]); });
+    if (pos >= deck.length) pos = 0;
+    flipped = false; render();
+  }
+  function render(){
+    var total = cards.filter(function(c){ return +babSel.value === 0 || c.b === +babSel.value; }).length;
+    var done = 0;
+    cards.forEach(function(c, i){ if ((+babSel.value === 0 || c.b === +babSel.value) && known[i]) done++; });
+    if (!deck.length){
+      side.textContent = "Selesai";
+      txt.textContent = "Semua kartu di pilihan ini sudah ditandai hafal. Ganti ke \"Semua kartu\" untuk mengulang.";
+      card.classList.remove("back");
+      stat.innerHTML = "Hafal <b>" + done + "</b> dari " + total;
+      knowBtn.disabled = true; return;
+    }
+    knowBtn.disabled = false;
+    var i = deck[pos], c = cards[i];
+    side.textContent = flipped ? "Jawaban · Bab " + c.b : "Pertanyaan · Bab " + c.b;
+    txt.textContent = flipped ? c.a : c.q;
+    card.classList.toggle("back", flipped);
+    knowBtn.textContent = known[i] ? "Batal hafal" : "Sudah hafal";
+    stat.innerHTML = "Kartu " + (pos + 1) + " / " + deck.length + " · Hafal <b>" + done + "</b> dari " + total;
+  }
+  function flip(){ if (deck.length){ flipped = !flipped; render(); } }
+  function go(d){ if (deck.length){ pos = (pos + d + deck.length) % deck.length; flipped = false; render(); } }
+
+  card.addEventListener("click", flip);
+  card.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); flip(); } });
+  document.getElementById("fcFlip").addEventListener("click", flip);
+  document.getElementById("fcNext").addEventListener("click", function(){ go(1); });
+  document.getElementById("fcPrev").addEventListener("click", function(){ go(-1); });
+  document.getElementById("fcShuffle").addEventListener("click", function(){
+    for (var k = order.length - 1; k > 0; k--){ var j = Math.floor(Math.random() * (k + 1)); var t = order[k]; order[k] = order[j]; order[j] = t; }
+    pos = 0; build();
+  });
+  knowBtn.addEventListener("click", function(){
+    if (!deck.length) return;
+    var i = deck[pos];
+    if (known[i]) delete known[i]; else known[i] = 1;
+    save();
+    if (modeSel.value === "todo") build(); else go(1);
+  });
+  babSel.addEventListener("change", function(){ pos = 0; build(); });
+  modeSel.addEventListener("change", function(){ pos = 0; build(); });
+  build();
+})();
+</script>
