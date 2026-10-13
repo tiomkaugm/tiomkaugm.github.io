@@ -216,7 +216,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
 <div class="wrap" id="top">
 <header class="top">
   <h1>Catatan UTS Agentic AI</h1>
-  <p class="meta">Rangkuman Bab I sampai V mata kuliah AI Agentic Technology Systems for Digital Enterprise Ecosystem (Prof. Dr. Azhari, MT) untuk ujian close book. Bagian yang distabilo kuning itu jembatan keledai, yang bergaris merah itu rawan keluar.</p>
+  <p class="meta">Rangkuman Bab I sampai V mata kuliah AI Agentic Technology Systems for Digital Enterprise Ecosystem (Prof. Dr. Azhari, MT) untuk ujian close book. Teks yang distabilo kuning adalah jembatan keledai buatan sendiri untuk membantu hafalan. Daftar aslinya tetap dari slide, dan itu yang ditulis waktu ujian. Bagian bergaris merah kemungkinan besar keluar di soal.</p>
   <p class="by">Disusun oleh Tio Rizky Almunazir (26/589483/PPA/07359), Magister Kecerdasan Artifisial UGM.</p>
   <ol class="ladder" aria-label="Delapan era AI dari otonomi terendah ke tertinggi">
     <li style="--w:250;--i:0"><span class="era">Traditional AI</span><span class="verb">rules, 1956</span></li>
@@ -228,7 +228,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
     <li style="--w:650;--i:6"><span class="era">Multi-Agentic AI</span><span class="verb">collaborate, 2023</span></li>
     <li style="--w:780;--i:7"><span class="era">Autonomous Enterprise</span><span class="verb">autonomize, 2025</span></li>
   </ol>
-  <p class="ladder-cap">Delapan era AI dari Bab I. Makin ke bawah otonominya makin tinggi, jadi hurufnya makin tebal. Kebutuhan governance juga ikut naik.</p>
+  <p class="ladder-cap">Delapan era AI dari Bab I. Tebal huruf mengikuti tingkat otonomi: Traditional AI paling rendah, Autonomous Enterprise paling tinggi dan paling butuh governance.</p>
 </header>
 
 <nav class="chips" aria-label="Lompat ke bagian">
@@ -240,7 +240,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
   <div class="bab-head"><h2>Peta cepat 5 bab</h2></div>
   <p class="lead">Kalau cuma sempat baca satu bagian sebelum masuk ruang ujian, baca ini.</p>
   <div class="map">
-    <div><span class="eyebrow">I. Evolusi AI</span><b>8 era AI</b>: Traditional, ML, DL, GenAI, AI Agent, Agentic AI, Multi-Agentic, Autonomous Enterprise. Makin ke kanan, otonomi naik dan kebutuhan governance ikut naik.</div>
+    <div><span class="eyebrow">I. Evolusi AI</span><b>8 era AI</b>: Traditional, ML, DL, GenAI, AI Agent, Agentic AI, Multi-Agentic, Autonomous Enterprise. Tiap era menambah otonomi, dan governance yang dibutuhkan ikut bertambah.</div>
     <div><span class="eyebrow">II. Fondasi agen</span><b>7 fondasi</b>: Environment, Rationality, Goals, Perception, Action, Autonomy, Learning. Plus PEAS, reactive vs deliberative, 4 komponen learning agent.</div>
     <div><span class="eyebrow">III. Single agent</span><b>BDI</b> (Belief, Desire, Intention), A = &lt;G,B,I,M,C,R,P,T&gt;, runtime, memory, tools/function calling, execution loop, studi kasus seleksi supplier.</div>
     <div><span class="eyebrow">IV. Multi-agent</span><b>MAS</b>: arsitektur centralized/decentralized/hybrid, ACL/KQML, konsensus, negosiasi, lelang, Contract Net, task allocation, Q-learning, trust, interoperabilitas.</div>
@@ -252,7 +252,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
 <!-- BAB 1 -->
 <section class="bab" id="bab1">
   <div class="bab-head"><span class="bab-no">I</span><h2>Evolusi AI dan teknologi agentic</h2></div>
-  <p class="lead">AI berevolusi dari sistem yang "menjawab" menjadi sistem yang "menjalankan bisnis": dari rules yang mengeksekusi instruksi sampai enterprise otonom yang bisa sense, decide, act, collaborate, dan learn.</p>
+  <p class="lead">Bab ini menelusuri AI dari rules yang hanya mengeksekusi instruksi sampai enterprise otonom yang bisa sense, decide, act, collaborate, dan learn sendiri. Slide menyebutnya pergeseran dari AI yang "menjawab" ke AI yang "menjalankan bisnis".</p>
 
   <div class="hafal"><span class="eyebrow">Jembatan keledai: 8 era dan kata kerjanya</span><br>
   <strong>"Raja Lapar Rebus Gado-gado, Ambil Piring Cuci Alat"</strong><br>
@@ -332,7 +332,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
   <p><i>A chatbot talks. An agent gets work done.</i></p>
 
   <h3>1.6 Agentic AI</h3>
-  <p>Enam ciri: <b>goal-oriented, planning, tool orchestration, reflection, bounded autonomy, escalation</b>. Agentic tidak sama dengan otonomi tanpa batas: tetap perlu scope, permission, policy, monitoring, dan akuntabilitas manusia.</p>
+  <p>Enam ciri: <b>goal-oriented, planning, tool orchestration, reflection, bounded autonomy, escalation</b>. Otonominya tetap dibatasi: sistem agentic di enterprise butuh scope, permission, policy, monitoring, dan manusia yang bertanggung jawab.</p>
   <div class="flow">Order-to-Cash: Interpret intent → Plan → Act (ERP, CRM, WMS) → Reflect → Complete</div>
   <div class="tbl"><table>
     <tr><th>Level</th><th>Peran manusia</th><th>Peran AI</th><th>Contoh</th></tr>
@@ -392,7 +392,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
     <tr><td>Change</td><td>Static</td><td>Dynamic</td><td>Sudoku vs logistik live</td></tr>
     <tr><td>Actors</td><td>Single-agent</td><td>Multi-agent</td><td>Planner vs marketplace</td></tr>
   </table></div>
-  <p>Environment enterprise umumnya <b>partially observable, stochastic, dynamic, multi-agent</b>. Makin ke arah itu, makin butuh memory, probabilistic reasoning, planning, koordinasi, dan learning.</p>
+  <p>Environment enterprise umumnya <b>partially observable, stochastic, dynamic, multi-agent</b>. Lingkungan seperti ini menuntut agen punya memory, probabilistic reasoning, planning, koordinasi, dan learning.</p>
 
   <h3>2.2 Rational agent</h3>
   <p>Memilih aksi dengan <b>expected performance terbaik</b> berdasarkan informasi yang tersedia saat itu. <b>Rationality ≠ omniscience</b>: agen tetap rasional walau hasil akhirnya buruk, asal keputusannya terbaik menurut evidence dan constraint saat keputusan dibuat.</p>
@@ -452,7 +452,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
   <div class="hafal"><span class="eyebrow">4 tingkat otonomi (naik)</span><br>
   <strong>Assist → Approve → Supervise → Delegate</strong><br>
   1 Assistive (hanya saran) · 2 Human-in-the-loop (tiap aksi penting perlu approval) · 3 Human-on-the-loop (agen bertindak, manusia mengawasi dan bisa override) · 4 Delegated autonomy (wewenang penuh dalam bounded scope)</div>
-  <p>Makin tinggi otonomi, makin ketat kebutuhan observability, audit trail, role-based permission, fallback. Prinsip <b>bounded autonomy</b>: hak bertindak dibatasi menurut domain, value-at-risk, confidence, dan dampak keputusan.</p>
+  <p>Tiap naik satu tingkat otonomi, observability, audit trail, role-based permission, dan fallback harus diperketat. Prinsip <b>bounded autonomy</b>: hak bertindak dibatasi menurut domain, value-at-risk, confidence, dan dampak keputusan.</p>
 
   <h3>2.7 Learning agent</h3>
   <div class="two">
@@ -475,7 +475,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
 <!-- BAB 3 -->
 <section class="bab" id="bab3">
   <div class="bab-head"><span class="bab-no">III</span><h2>Sistem agen tunggal cerdas</h2></div>
-  <p class="lead">Kecerdasan agen datang dari koordinasi komponen internalnya. Model AI saja hanya model prediksi statis; baru jadi agen kalau dipadukan dengan goal, memory, tools, context, policy, dan action.</p>
+  <p class="lead">Kecerdasan agen datang dari koordinasi komponen internalnya. Model AI sendirian hanya menghasilkan prediksi statis. Agen baru terbentuk saat model itu dipadukan dengan goal, memory, tools, context, policy, dan action.</p>
 
   <h3>3.1 Komponen dan alur kognitif</h3>
   <p>Komponen: Goal, Environment, Perception, Belief, Reasoning, Planning, Intention, Action, Feedback.</p>
@@ -793,7 +793,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
     <tr><td>Healthcare</td><td>Triage, bed, doctor, pharmacy, care coordinator</td><td>Utility + constraint</td><td>\(P = 0.45S + 0.25R + 0.20W + 0.10C\); P1 = 0.735 didahulukan</td></tr>
     <tr><td>Smart manufacturing</td><td>Machine, order, maintenance, AGV</td><td>Negotiated scheduling</td><td>Makespan = 9</td></tr>
   </table></div>
-  <p>Prinsip penting: multi-agent bukan sekadar banyak chatbot. Harus ada autonomy, interaction, coordination, dan joint system behavior.</p>
+  <p>Prinsip penting dari slide: sistem baru layak disebut multi-agent kalau punya autonomy, interaction, coordination, dan joint system behavior. Menjalankan banyak chatbot sekaligus belum memenuhi syarat itu.</p>
 
   <div class="rawan"><span class="eyebrow">Rawan keluar (bab paling berat, paling banyak hitungan)</span>
   <ul>
@@ -808,7 +808,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
 <!-- BAB 5 -->
 <section class="bab" id="bab5">
   <div class="bab-head"><span class="bab-no">V</span><h2>Intelligent mobile agent system</h2></div>
-  <p class="lead">Mobile agent bisa berpindah antar host sambil membawa <b>kode dan state eksekusinya</b>. Komputasi mendekati data, sehingga komunikasi dan latency berkurang.</p>
+  <p class="lead">Mobile agent bisa berpindah antar host sambil membawa <b>kode dan state eksekusinya</b>. Karena kodenya yang datang ke data, data tidak perlu dikirim bolak-balik, jadi beban komunikasi dan latency turun.</p>
 
   <div class="tbl"><table>
     <tr><th>Static agent</th><th>Mobile agent</th><th>Multi-agent system</th></tr>
@@ -971,7 +971,7 @@ math[display="block"]{display:block;max-width:100%;margin:.55em 0;overflow-x:aut
   <div class="ans">\(R_{\text{sys}} = 1 - (1 - 0.9)^3 = 1 - 0.001 = \mathbf{0.999}\).</div></details>
 
   <details class="soal"><summary>4. Speedup: single agent 100 s, 4 agen 29 s. Hitung speedup dan efisiensi paralel.</summary>
-  <div class="ans">\[ \text{Speedup} = \frac{100}{29} \approx \mathbf{3.45\times} \qquad \eta = \frac{3.45}{4} \approx \mathbf{0.86} \]Makin dekat \(\eta\) ke 1, makin efektif pembagian kerjanya.</div></details>
+  <div class="ans">\[ \text{Speedup} = \frac{100}{29} \approx \mathbf{3.45\times} \qquad \eta = \frac{3.45}{4} \approx \mathbf{0.86} \]Nilai \(\eta\) yang mendekati 1 berarti pembagian kerjanya efektif.</div></details>
 
   <details class="soal"><summary>5. Consensus: \(\mathbf{x}^{(0)} = [10, 20, 30]^{\top}\) dengan \(W\) seperti di Bab IV. Hitung \(\mathbf{x}^{(1)}\) dan \(\mathbf{x}^{(2)}\).</summary>
   <div class="ans">Kalikan tiap baris \(W\) dengan vektor \(\mathbf{x}\):
