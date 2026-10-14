@@ -45,6 +45,7 @@
       src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
       crossorigin="anonymous"
     ></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
     <style>
       /* Layout: satu kolom rata kiri seperti buku catatan. Hero = tangga 8 era AI, tebal huruf naik mengikuti otonomi.
    Stabilo kuning untuk hafalan, tinta merah untuk "rawan keluar", tinta biru untuk alur proses. */
@@ -717,6 +718,197 @@
         overflow-y: hidden;
       }
 
+      /* knowledge graph */
+      :root {
+        --k1: #2343c9;
+        --k2: #0f7b6c;
+        --k3: #b06a00;
+        --k4: #7a3bd1;
+        --k5: #c0306a;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --k1: #94a9ff;
+          --k2: #4fd1b8;
+          --k3: #f0b64f;
+          --k4: #c4a1ff;
+          --k5: #ff8fb8;
+        }
+      }
+      :root[data-theme="dark"] {
+        --k1: #94a9ff;
+        --k2: #4fd1b8;
+        --k3: #f0b64f;
+        --k4: #c4a1ff;
+        --k5: #ff8fb8;
+      }
+      .kg-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 14px 0 10px;
+      }
+      .kg-bar button {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 36px;
+      }
+      .kg-bar button[aria-pressed="true"] {
+        border-color: var(--ink);
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .kg-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .kg-dot.k1, .kg-node.k1 circle { background: var(--k1); fill: var(--k1); }
+      .kg-dot.k2, .kg-node.k2 circle { background: var(--k2); fill: var(--k2); }
+      .kg-dot.k3, .kg-node.k3 circle { background: var(--k3); fill: var(--k3); }
+      .kg-dot.k4, .kg-node.k4 circle { background: var(--k4); fill: var(--k4); }
+      .kg-dot.k5, .kg-node.k5 circle { background: var(--k5); fill: var(--k5); }
+      .kg-wrap {
+        position: relative;
+        background: var(--sheet);
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      #kgSvg {
+        display: block;
+        width: 100%;
+        height: clamp(380px, 62vw, 600px);
+        cursor: grab;
+      }
+      .kg-zoom {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        display: flex;
+        gap: 6px;
+      }
+      .kg-zoom button {
+        min-width: 40px;
+        min-height: 40px;
+        padding: 4px 10px;
+      }
+      .kg-link {
+        stroke: var(--rule);
+        stroke-width: 1.2;
+        vector-effect: non-scaling-stroke;
+      }
+      #kgSvg.small .kg-node text {
+        display: none;
+      }
+      #kgSvg.small .kg-node.sel text,
+      #kgSvg.small .kg-node.nb text,
+      #kgSvg.small .kg-node.inbab text {
+        display: block;
+      }
+      .kg-link.hot {
+        stroke: var(--ink);
+        stroke-width: 1.8;
+      }
+      .kg-node circle {
+        stroke: var(--sheet);
+        stroke-width: 2;
+      }
+      .kg-node text {
+        font-family: var(--f-display);
+        font-weight: 600;
+        fill: var(--ink);
+        paint-order: stroke;
+        stroke: var(--sheet);
+        stroke-linejoin: round;
+        pointer-events: none;
+      }
+      .kg-node {
+        cursor: pointer;
+        outline: none;
+      }
+      .kg-node:focus-visible circle {
+        stroke: var(--blue);
+        stroke-width: 4;
+      }
+      .kg-node.sel circle {
+        stroke: var(--ink);
+        stroke-width: 3;
+      }
+      .kg-node.sel text {
+        font-weight: 800;
+      }
+      .kg-elabel {
+        font-family: var(--f-body);
+        font-style: italic;
+        fill: var(--graphite);
+        paint-order: stroke;
+        stroke: var(--sheet);
+        pointer-events: none;
+        display: none;
+      }
+      .kg-elabel.hot {
+        display: block;
+      }
+      .dim {
+        opacity: 0.14;
+      }
+      .kg-panel {
+        margin-top: 12px;
+        border-left: 3px solid var(--blue);
+        padding: 2px 0 2px 14px;
+      }
+      .kg-panel h4 {
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .kg-panel ul {
+        list-style: none;
+        padding: 0;
+        margin: 6px 0;
+      }
+      .kg-panel li,
+      #kgList li {
+        margin: 3px 0;
+      }
+      .kg-p {
+        font-style: italic;
+        color: var(--graphite);
+      }
+      .kg-panel button.kg-jump {
+        border: 0;
+        background: none;
+        padding: 0;
+        font: inherit;
+        font-weight: 650;
+        color: var(--blue);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        cursor: pointer;
+      }
+      .kg-all {
+        margin-top: 14px;
+      }
+      .kg-all summary {
+        cursor: pointer;
+        font-family: var(--f-display);
+        font-weight: 600;
+        color: var(--blue);
+      }
+      #kgList h4 {
+        margin-top: 12px;
+      }
+      #kgList ul {
+        list-style: none;
+        padding: 0;
+        margin: 4px 0;
+        font-size: 0.95rem;
+      }
+
       /* HP */
       @media (max-width: 600px) {
         body {
@@ -897,6 +1089,7 @@
         ><a href="#bab3"><span class="rn">III</span>Single agent</a
         ><a href="#bab4"><span class="rn">IV</span>Multi-agent</a
         ><a href="#bab5"><span class="rn">V</span>Mobile agent</a
+        ><a href="#kg">Knowledge graph</a
         ><a href="#rumus">Rumus</a><a href="#latihan">Latihan</a
         ><a href="#flash">Flashcard</a>
       </nav>
@@ -1343,6 +1536,11 @@
             tersambung ke kapabilitas."
           </div>
         </div>
+        <p>
+          Implikasinya untuk enterprise: dengan A2A dan MCP, <b>agen heterogen</b>
+          dari model, vendor, dan tools yang berbeda tetap bisa berkolaborasi
+          sambil menjaga trust boundary masing-masing.
+        </p>
         <div class="tbl">
           <table>
             <tr>
@@ -1584,14 +1782,56 @@
           </table>
         </div>
         <div class="eq">
-          \[ a^{*} = \operatorname*{argmax}_{a}\; U(a) \quad \text{dengan syarat
-          Goal dan Constraints terpenuhi} \]
+          \[ a^{*} = \operatorname*{argmax}_{a}\; U(a) \]
+          <p class="eq-note">dengan syarat Goal dan Constraints terpenuhi.</p>
         </div>
         <p>
           Goal = apa yang ingin dicapai. Utility = outcome mana lebih disukai.
           Constraint = apa yang tidak boleh dilanggar (budget, compliance,
           privacy, safety).
         </p>
+        <p>
+          Agen dengan banyak goal butuh <b>conflict resolution</b>, karena
+          tujuannya bisa saling bertabrakan. Contoh dari slide: menekan biaya
+          sambil tetap menjaga service level. Agen menyelesaikannya dengan
+          prioritas, utility, dan policy.
+        </p>
+
+        <h3>Studi kasus: rute dan armada startup logistik</h3>
+        <p>
+          Startup logistik di Yogyakarta ingin memangkas waktu kirim dalam kota
+          dari rata-rata 2 hari jadi 1 hari (maksimal 24 jam). Prioritas utama
+          kecepatan, prioritas kedua biaya operasional rendah dan kepuasan
+          pelanggan.
+        </p>
+        <ol>
+          <li>
+            <b>Input goal dan constraint.</b> Manajer cukup memasukkan target,
+            misalnya "kirim 5.000 paket hari ini dengan biaya minimum dan
+            ketepatan waktu &gt;98%", ditambah batasan jam kerja pengemudi dan
+            kapasitas maksimal truk.
+          </li>
+          <li>
+            <b>Goal decomposition.</b> Agen memecah target besar jadi subtugas:
+            klasterisasi wilayah, estimasi waktu penjemputan, dan pembagian
+            beban kurir.
+          </li>
+          <li>
+            <b>Dynamic replanning.</b> Kalau ada kendala tak terduga (banjir,
+            macet total, ban pecah), agen tidak berhenti. Agen menyusun ulang
+            rute alternatif supaya target awal tetap terkejar.
+          </li>
+          <li>
+            <b>Eksekusi lewat tools.</b> GPS &amp; Traffic API untuk jalur
+            tercepat, Fleet &amp; Driver Management (TMS API) untuk mengirim
+            rute ke HP pengemudi, Warehouse API untuk antrean bongkar muat.
+          </li>
+          <li>
+            <b>Continuous evaluation loop.</b> Hasil tiap pengiriman dibandingkan
+            dengan target, lalu dipakai untuk memperbaiki perencanaan rute
+            berikutnya.
+          </li>
+        </ol>
 
         <h3>2.4 Perception dan action</h3>
         <div class="flow">
@@ -1990,6 +2230,13 @@
           Sumber feedback: tool result, environment feedback, user/manager
           feedback, model evaluation.
         </p>
+        <p>
+          Slide menyebut tahap ini <b>refleksi diri dan koreksi otomatis</b>
+          (self-correction): agen mengecek correctness dan compliance hasilnya,
+          lalu merevisi plan atau melakukan eskalasi. Contoh agen reservasi
+          stok: reservasi gagal, agen mengevaluasi gudang alternatif, mengubah
+          plan, dan meminta approval kalau biayanya melewati threshold.
+        </p>
 
         <h3>3.9 dan 3.10 Jenis agen menurut tugas</h3>
         <div class="tbl">
@@ -2284,6 +2531,13 @@
             </tr>
           </table>
         </div>
+        <p>
+          <i>Padanan istilah (bukan dari slide, untuk jaga-jaga kalau soal
+          memakai istilah silabus):</i> centralized ≈ supervisor-worker atau
+          orchestrator dengan agen spesialis (Bab I), decentralized ≈
+          peer-to-peer, hybrid ≈ hierarchical (leader cluster + peer, seperti
+          swarm UAV).
+        </p>
         <ul>
           <li>
             Centralized overload: 10 worker × 50 msg/s = 500 msg/s, kapasitas
@@ -2357,8 +2611,11 @@
         </div>
         <p>
           <b>Ontologi</b>: kosakata bersama supaya dua agen tidak memberi arti
-          berbeda. Bentuk triple (subject, predicate, object), misalnya
-          (Order42, hasStatus, Paid). Semantic mapping: customer_id ≡ buyer_key
+          berbeda. Slide merepresentasikannya sebagai <b>knowledge graph</b>
+          \(KG = \{(s, p, o)\}\), yaitu kumpulan triple (subject, predicate,
+          object), misalnya (Order42, hasStatus, Paid) dan (Order42, belongsTo,
+          Buyer01). Peta konsep di bagian <a href="#kg">Knowledge graph</a>
+          memakai format yang sama. Semantic mapping: customer_id ≡ buyer_key
           diterima kalau \(\operatorname{sim} \ge \theta\) (contoh \(0.92 \ge
           0.85\)).
         </p>
@@ -2665,6 +2922,13 @@
             (request/reply, pub-sub) · Operational (API, identity, SLA)</strong
           >
         </div>
+        <p>
+          Contoh integrasi IoT dan <b>legacy system</b>: sensor mengirim
+          <code>temp_c</code>, sedangkan agen mengharapkan
+          <code>temperature_C</code>, dan sistem lama memakai °F. Adapter
+          memetakan nama field, satuan, timestamp, dan quality flag. Semantik
+          tidak cukup dari nama field, satuannya juga harus konsisten.
+        </p>
         <div class="eq">
           \[ I = \langle \text{Schema}, \text{Semantics}, \text{Protocol},
           \text{Auth}, \text{QoS} \rangle \] \[ T_F = \tfrac{9}{5}\, T_C + 32
@@ -2725,6 +2989,23 @@
           kalau punya autonomy, interaction, coordination, dan joint system
           behavior. Menjalankan banyak chatbot sekaligus belum memenuhi syarat
           itu.
+        </p>
+
+        <h3>Mengukur agen</h3>
+        <p>
+          Slide menekankan bahwa MAS diukur sebagai sistem, bukan dari akurasi
+          satu model saja:
+        </p>
+        <div class="eq">
+          \[ K = [\,\text{latency},\ \text{throughput},\ \text{cost},\
+          \text{robustness},\ \text{utility},\ \text{trust}\,]^{\top} \]
+        </div>
+        <p>
+          Untuk satu agen di produksi (Bab III), observability mengukur success
+          rate (\(\text{completed}/\text{total}\)), latency, cost atau
+          pemakaian token, API failure, retry, dan escalation, ditambah tracing
+          dan audit trail. Contoh KPI bisnisnya ada di studi kasus supplier:
+          cycle time, kualitas, cost saving, dan override rate.
         </p>
 
         <div class="rawan">
@@ -3043,6 +3324,37 @@
       </section>
 
       <!-- LEMBAR RUMUS -->
+      <section class="bab" id="kg">
+        <div class="bab-head"><h2>Knowledge graph materi</h2></div>
+        <p class="lead">
+          Peta hubungan antar konsep Bab I sampai V. Tiap garis adalah satu
+          triple (subject, predicate, object), sama seperti definisi knowledge
+          graph \(KG = \{(s, p, o)\}\) di Bab IV. Ketuk satu konsep untuk
+          melihat semua hubungannya.
+        </p>
+        <div class="kg-bar" id="kgFilter" role="group" aria-label="Sorot bab">
+          <button type="button" data-b="0" aria-pressed="true">Semua</button>
+          <button type="button" data-b="1" aria-pressed="false"><span class="kg-dot k1"></span>I</button>
+          <button type="button" data-b="2" aria-pressed="false"><span class="kg-dot k2"></span>II</button>
+          <button type="button" data-b="3" aria-pressed="false"><span class="kg-dot k3"></span>III</button>
+          <button type="button" data-b="4" aria-pressed="false"><span class="kg-dot k4"></span>IV</button>
+          <button type="button" data-b="5" aria-pressed="false"><span class="kg-dot k5"></span>V</button>
+        </div>
+        <div class="kg-wrap">
+          <svg id="kgSvg" role="img" aria-label="Knowledge graph konsep Bab I sampai V"></svg>
+          <div class="kg-zoom">
+            <button type="button" id="kgIn" aria-label="Perbesar">+</button>
+            <button type="button" id="kgOut" aria-label="Perkecil">−</button>
+            <button type="button" id="kgFit">Pas</button>
+          </div>
+        </div>
+        <div class="kg-panel" id="kgPanel" aria-live="polite"></div>
+        <details class="kg-all">
+          <summary>Semua triple dalam bentuk teks</summary>
+          <div id="kgList"></div>
+        </details>
+      </section>
+
       <section class="bab" id="rumus">
         <div class="bab-head"><h2>Lembar rumus satu tempat</h2></div>
         <p class="lead">
@@ -3922,6 +4234,46 @@
             q: "4 peran agen di MIMA?",
             a: "Scout (sensing data), Broker (matching & alokasi), Worker (eksekusi & lapor), Security (policy & compliance).",
           },
+          {
+            b: 1,
+            q: "Apa implikasi A2A + MCP untuk agen heterogen?",
+            a: "Agen dari model, vendor, dan tools yang berbeda tetap bisa berkolaborasi sambil menjaga trust boundary masing-masing.",
+          },
+          {
+            b: 2,
+            q: "Kenapa multi-goal agent butuh conflict resolution?",
+            a: "Tujuannya bisa bertabrakan, misalnya menekan biaya sambil menjaga service level. Agen memutuskan dengan prioritas, utility, dan policy.",
+          },
+          {
+            b: 2,
+            q: "Goal decomposition pada kasus rute armada startup logistik?",
+            a: "Target besar (kirim 5.000 paket hari ini, biaya minimum, ketepatan >98%) dipecah jadi klasterisasi wilayah, estimasi waktu penjemputan, dan pembagian beban kurir.",
+          },
+          {
+            b: 2,
+            q: "Apa itu dynamic replanning?",
+            a: "Saat ada kendala tak terduga (banjir, macet total, ban pecah), agen tidak berhenti tapi menyusun ulang rute alternatif supaya target awal tetap terkejar.",
+          },
+          {
+            b: 3,
+            q: "Self-correction di agentic execution loop?",
+            a: "Agen mengecek correctness dan compliance hasilnya, lalu merevisi plan atau eskalasi. Contoh: reservasi stok gagal → cek gudang alternatif → ubah plan → minta approval kalau biaya melewati threshold.",
+          },
+          {
+            b: 4,
+            q: "Padanan centralized, decentralized, hybrid dengan istilah silabus?",
+            a: "Centralized ≈ supervisor-worker / orchestrator. Decentralized ≈ peer-to-peer. Hybrid ≈ hierarchical (leader cluster + peer).\n(Padanan ini bukan dari slide.)",
+          },
+          {
+            b: 4,
+            q: "Bentuk knowledge graph di slide?",
+            a: "\\(KG = \\{(s, p, o)\\}\\): kumpulan triple subject-predicate-object, contoh (Order42, hasStatus, Paid).",
+          },
+          {
+            b: 4,
+            q: "KPI vector untuk mengukur MAS?",
+            a: "K = [latency, throughput, cost, robustness, utility, trust]. MAS diukur sebagai sistem, bukan dari akurasi satu model.",
+          },
         ];
 
         var KEY = "uts-agentic-known";
@@ -4130,6 +4482,226 @@
         }
         window.addEventListener("scroll", u, { passive: true });
         u();
+      })();
+    </script>
+      <script>
+      (function () {
+        var BAB = ["", "I", "II", "III", "IV", "V"];
+        var N = [
+          ["trad", "Traditional AI", 1], ["ml", "Machine Learning", 1], ["dl", "Deep Learning", 1],
+          ["gen", "Generative AI", 1], ["agent", "AI Agent", 1], ["agentic", "Agentic AI", 1],
+          ["multi", "Multi-Agentic AI", 1], ["auto", "Autonomous Enterprise", 1], ["chatbot", "Chatbot", 1],
+          ["orch", "Orchestrator agent", 1], ["a2a", "A2A", 1], ["mcp", "MCP", 1], ["lvl", "Maturity L0-L5", 1],
+          ["env", "Environment", 2], ["rational", "Rational agent", 2], ["peas", "PEAS", 2],
+          ["goal", "Goal", 2], ["utility", "Utility", 2], ["constraint", "Constraint", 2],
+          ["percept", "Perception", 2], ["action", "Action", 2], ["reactive", "Reactive agent", 2],
+          ["delib", "Deliberative agent", 2], ["hybridag", "Hybrid agent", 2], ["bounded", "Bounded autonomy", 2],
+          ["hitl", "Human-in-the-loop", 2], ["hotl", "Human-on-the-loop", 2], ["learnag", "Learning agent", 2],
+          ["critic", "Critic", 2], ["decomp", "Goal decomposition", 2], ["replan", "Dynamic replanning", 2],
+          ["bdi", "BDI", 3], ["belief", "Belief", 3], ["desire", "Desire", 3], ["intention", "Intention", 3],
+          ["memory", "Memory", 3], ["context", "Context", 3], ["tools", "Tools / function calling", 3],
+          ["runtime", "Runtime", 3], ["selfcorr", "Self-correction", 3], ["policy", "Policy engine", 3],
+          ["llm", "LLM", 3], ["supplier", "Seleksi supplier", 3],
+          ["mas", "MAS", 4], ["central", "Centralized", 4], ["decentral", "Decentralized", 4],
+          ["hybridarch", "Hybrid architecture", 4], ["acl", "ACL / KQML", 4], ["onto", "Ontologi", 4],
+          ["kg", "Knowledge graph", 4], ["consensus", "Consensus", 4], ["nego", "Negosiasi", 4],
+          ["auction", "Lelang English/Dutch", 4], ["cnp", "Contract Net Protocol", 4], ["nash", "Nash bargaining", 4],
+          ["alloc", "Task allocation", 4], ["marl", "Distributed RL", 4], ["ql", "Q-learning", 4],
+          ["fed", "Federated averaging", 4], ["trust", "Trust model", 4], ["sec", "Security", 4],
+          ["interop", "Interoperabilitas", 4],
+          ["mobile", "Mobile agent", 5], ["migr", "Protokol migrasi", 5], ["sandbox", "Sandbox", 5],
+          ["rlmig", "RL / MDP migrasi", 5], ["rag", "RAG", 5], ["gnn", "GNN", 5], ["mima", "MIMA", 5]
+        ];
+        var T = [
+          ["trad", "berkembang jadi", "ml"], ["ml", "berkembang jadi", "dl"], ["dl", "berkembang jadi", "gen"],
+          ["gen", "berkembang jadi", "agent"], ["agent", "berkembang jadi", "agentic"],
+          ["agentic", "berkembang jadi", "multi"], ["multi", "berkembang jadi", "auto"],
+          ["dl", "adalah subset dari", "ml"], ["agent", "berbeda dari", "chatbot"],
+          ["agent", "memakai", "tools"], ["agent", "menyimpan state di", "memory"], ["llm", "jadi reasoning engine untuk", "agent"],
+          ["agentic", "dibatasi oleh", "bounded"], ["agentic", "naik bertahap lewat", "lvl"], ["agentic", "punya kemampuan", "selfcorr"],
+          ["multi", "dikoordinasi oleh", "orch"], ["multi", "dibahas detail sebagai", "mas"],
+          ["a2a", "menghubungkan agen dengan", "multi"], ["mcp", "menghubungkan agen dengan", "tools"],
+          ["a2a", "adalah lapisan dari", "interop"], ["mcp", "adalah lapisan dari", "interop"],
+          ["auto", "diawasi lewat", "hitl"],
+          ["agent", "beroperasi di", "env"], ["rational", "dirumuskan dengan", "peas"],
+          ["rational", "memilih aksi dengan", "utility"], ["action", "memaksimalkan", "utility"],
+          ["action", "harus memenuhi", "constraint"], ["action", "diarahkan oleh", "goal"],
+          ["percept", "menjadi dasar", "action"], ["hybridag", "menggabungkan", "reactive"],
+          ["hybridag", "menggabungkan", "delib"], ["bounded", "diawasi lewat", "hitl"], ["bounded", "diawasi lewat", "hotl"],
+          ["learnag", "punya komponen", "critic"], ["decomp", "memecah", "goal"], ["replan", "tetap mengejar", "goal"],
+          ["delib", "menyusun ulang plan lewat", "replan"],
+          ["bdi", "terdiri dari", "belief"], ["bdi", "terdiri dari", "desire"], ["bdi", "terdiri dari", "intention"],
+          ["intention", "dipilih dari", "desire"], ["percept", "memperbarui", "belief"], ["bdi", "adalah jenis", "delib"],
+          ["memory", "berbeda dari", "context"], ["runtime", "mengeksekusi", "tools"], ["runtime", "mengelola", "memory"],
+          ["policy", "memvalidasi", "action"], ["selfcorr", "memicu", "replan"], ["selfcorr", "bisa eskalasi ke", "hitl"],
+          ["supplier", "memakai", "llm"], ["supplier", "memakai", "policy"], ["supplier", "memaksimalkan", "utility"],
+          ["mas", "punya arsitektur", "central"], ["mas", "punya arsitektur", "decentral"], ["mas", "punya arsitektur", "hybridarch"],
+          ["orch", "setara dengan", "central"], ["decentral", "sepakat lewat", "consensus"],
+          ["mas", "berkomunikasi dengan", "acl"], ["acl", "maknanya dijaga oleh", "onto"], ["onto", "direpresentasikan sebagai", "kg"],
+          ["mas", "menyelesaikan konflik lewat", "nego"], ["nego", "punya bentuk", "auction"], ["nego", "punya bentuk", "cnp"],
+          ["nego", "dicari titik adilnya dengan", "nash"], ["cnp", "dipakai untuk", "alloc"],
+          ["mas", "belajar lewat", "marl"], ["marl", "memakai", "ql"], ["marl", "berbagi model lewat", "fed"],
+          ["mas", "dijaga oleh", "trust"], ["mas", "dijaga oleh", "sec"], ["interop", "memakai", "onto"],
+          ["mobile", "berpindah lewat", "migr"], ["mobile", "adalah jenis", "agent"], ["migr", "dijalankan di dalam", "sandbox"],
+          ["sandbox", "adalah bagian dari", "sec"], ["migr", "mensyaratkan", "trust"], ["rlmig", "memutuskan", "migr"],
+          ["rlmig", "memakai", "ql"], ["rag", "memberi evidence ke", "llm"], ["rag", "mengambil dari", "kg"],
+          ["gnn", "memodelkan jaringan", "mobile"], ["mima", "adalah", "mas"], ["mima", "terdiri dari", "mobile"]
+        ];
+        var byId = {};
+        N = N.map(function (n) { var o = { id: n[0], label: n[1], b: n[2] }; byId[o.id] = o; return o; });
+
+        function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+        function tripleHtml(t, jump) {
+          var s = byId[t[0]], o = byId[t[2]];
+          var name = function (n) {
+            return jump ? '<button type="button" class="kg-jump" data-id="' + n.id + '">' + esc(n.label) + "</button>" : "<b>" + esc(n.label) + "</b>";
+          };
+          return "(" + name(s) + ', <span class="kg-p">' + esc(t[1]) + "</span>, " + name(o) + ")";
+        }
+
+        // daftar teks (tetap jalan walau d3 gagal)
+        var list = document.getElementById("kgList"), html = "";
+        for (var b = 1; b <= 5; b++) {
+          var rows = T.filter(function (t) { return byId[t[0]].b === b; });
+          html += "<h4>Bab " + BAB[b] + "</h4><ul>" + rows.map(function (t) { return "<li>" + tripleHtml(t, false) + "</li>"; }).join("") + "</ul>";
+        }
+        list.innerHTML = html;
+
+        var panel = document.getElementById("kgPanel");
+        var select = function () {};
+        function showPanel(id) {
+          var n = byId[id];
+          var rel = T.filter(function (t) { return t[0] === id || t[2] === id; });
+          panel.innerHTML =
+            '<h4><span class="kg-dot k' + n.b + '"></span>' + esc(n.label) + "</h4>" +
+            "<ul>" + rel.map(function (t) { return "<li>" + tripleHtml(t, true) + "</li>"; }).join("") + "</ul>" +
+            '<a href="#bab' + n.b + '">Baca materinya di Bab ' + BAB[n.b] + "</a>";
+        }
+        panel.addEventListener("click", function (e) {
+          var btn = e.target.closest(".kg-jump");
+          if (btn) select(btn.getAttribute("data-id"), true);
+        });
+
+        function draw() {
+          if (!window.d3) { showPanel("agentic"); return; }
+          var d3 = window.d3;
+          var svg = d3.select("#kgSvg");
+          var links = T.map(function (t) { return { source: t[0], target: t[2], p: t[1] }; });
+          var R = 175, cx = {}, cy = {};
+          for (var b = 1; b <= 5; b++) {
+            var ang = -Math.PI / 2 + ((b - 1) * 2 * Math.PI) / 5;
+            cx[b] = Math.cos(ang) * R; cy[b] = Math.sin(ang) * R;
+          }
+          var sim = d3.forceSimulation(N)
+            .force("link", d3.forceLink(links).id(function (d) { return d.id; }).distance(46).strength(0.3))
+            .force("charge", d3.forceManyBody().strength(-110))
+            .force("collide", d3.forceCollide().radius(function (d) { return 8 + d.label.length * 1.6; }).strength(0.8))
+            .force("x", d3.forceX(function (d) { return cx[d.b]; }).strength(0.12))
+            .force("y", d3.forceY(function (d) { return cy[d.b]; }).strength(0.12))
+            .stop();
+          for (var i = 0; i < 420; i++) sim.tick();
+
+          var xs = N.map(function (d) { return d.x; }), ys = N.map(function (d) { return d.y; });
+          var pad = 40, x0 = Math.min.apply(null, xs) - pad, y0 = Math.min.apply(null, ys) - pad;
+          var w = Math.max.apply(null, xs) - x0 + pad, h = Math.max.apply(null, ys) - y0 + pad;
+          svg.attr("viewBox", [x0, y0, w, h].join(" ")).attr("preserveAspectRatio", "xMidYMid meet");
+
+          var g = svg.append("g");
+          var link = g.append("g").selectAll("line").data(links).join("line").attr("class", "kg-link")
+            .attr("x1", function (d) { return d.source.x; }).attr("y1", function (d) { return d.source.y; })
+            .attr("x2", function (d) { return d.target.x; }).attr("y2", function (d) { return d.target.y; });
+          var elabel = g.append("g").selectAll("text").data(links).join("text").attr("class", "kg-elabel")
+            .attr("text-anchor", "middle")
+            .attr("x", function (d) { return (d.source.x + d.target.x) / 2; })
+            .attr("y", function (d) { return (d.source.y + d.target.y) / 2 - 3; })
+            .text(function (d) { return d.p; });
+          var node = g.append("g").selectAll("g").data(N).join("g")
+            .attr("class", function (d) { return "kg-node k" + d.b; })
+            .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
+            .attr("tabindex", 0).attr("role", "button")
+            .attr("aria-label", function (d) { return d.label; });
+          node.append("circle").attr("r", 7);
+          node.append("text").attr("text-anchor", "middle").attr("y", -11).text(function (d) { return d.label; });
+
+          var zk = 1;
+          function rescale() {
+            var el = svg.node(), kv = Math.min(el.clientWidth / w, el.clientHeight / h) || 1, kt = kv * zk;
+            node.select("circle").attr("r", 7 / kt);
+            node.select("text").attr("font-size", 11.5 / kt + "px").attr("y", -(7 + 5) / kt);
+            node.selectAll("text").style("stroke-width", 3.5 / kt + "px");
+            elabel.attr("font-size", 10 / kt + "px").style("stroke-width", 3 / kt + "px");
+            svg.classed("small", kt < 0.85);
+          }
+          var zoom = d3.zoom().scaleExtent([0.6, 6])
+            .filter(function (e) { return !e.touches && !e.button && (e.type !== "wheel" || e.ctrlKey || e.metaKey); })
+            .on("zoom", function (e) { zk = e.transform.k; g.attr("transform", e.transform); rescale(); });
+          window.addEventListener("resize", rescale);
+          svg.call(zoom).on("dblclick.zoom", null);
+          svg.style("touch-action", "pan-x pan-y");
+
+          var babFilter = 0, current = null;
+          function paint() {
+            var nb = {};
+            if (current) {
+              nb[current] = true;
+              links.forEach(function (l) {
+                if (l.source.id === current) nb[l.target.id] = true;
+                if (l.target.id === current) nb[l.source.id] = true;
+              });
+            }
+            node.classed("sel", function (d) { return d.id === current; })
+              .classed("nb", function (d) { return !!current && !!nb[d.id] && d.id !== current; })
+              .classed("inbab", function (d) { return !current && !!babFilter && d.b === babFilter; })
+              .classed("dim", function (d) {
+                if (current) return !nb[d.id];
+                return babFilter && d.b !== babFilter;
+              });
+            link.classed("hot", function (l) { return current && (l.source.id === current || l.target.id === current); })
+              .classed("dim", function (l) {
+                if (current) return !(l.source.id === current || l.target.id === current);
+                return babFilter && l.source.b !== babFilter && l.target.b !== babFilter;
+              });
+            elabel.classed("hot", function (l) { return current && (l.source.id === current || l.target.id === current); });
+          }
+          select = function (id, center, instant) {
+            current = id; showPanel(id); paint();
+            if (center) {
+              var d = byId[id], k = Math.max(d3.zoomTransform(svg.node()).k, 1.6);
+              var mx = x0 + w / 2, my = y0 + h / 2;
+              var t = d3.zoomIdentity.translate(mx, my).scale(k).translate(-d.x, -d.y);
+              if (instant) svg.call(zoom.transform, t);
+              else svg.transition().duration(450).call(zoom.transform, t);
+            }
+          };
+          node.on("click", function (e, d) { select(d.id, true); })
+            .on("keydown", function (e, d) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(d.id, true); } });
+          svg.on("click", function (e) { if (e.target === svg.node()) { current = null; paint(); } });
+
+          document.getElementById("kgIn").onclick = function () { svg.transition().duration(250).call(zoom.scaleBy, 1.4); };
+          document.getElementById("kgOut").onclick = function () { svg.transition().duration(250).call(zoom.scaleBy, 1 / 1.4); };
+          function fitTo(list) {
+            if (!list.length) return;
+            var xs2 = list.map(function (d) { return d.x; }), ys2 = list.map(function (d) { return d.y; });
+            var bx0 = Math.min.apply(null, xs2) - 30, bx1 = Math.max.apply(null, xs2) + 30;
+            var by0 = Math.min.apply(null, ys2) - 30, by1 = Math.max.apply(null, ys2) + 30;
+            var k = Math.max(1, Math.min(6, Math.min(w / (bx1 - bx0), h / (by1 - by0))));
+            var mx = x0 + w / 2, my = y0 + h / 2;
+            var tr = d3.zoomIdentity.translate(mx, my).scale(k).translate(-(bx0 + bx1) / 2, -(by0 + by1) / 2);
+            svg.transition().duration(450).call(zoom.transform, tr);
+          }
+          document.getElementById("kgFit").onclick = function () { svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity); };
+          document.getElementById("kgFilter").addEventListener("click", function (e) {
+            var btn = e.target.closest("button"); if (!btn) return;
+            babFilter = +btn.getAttribute("data-b"); current = null;
+            this.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === btn ? "true" : "false"); });
+            paint();
+            if (babFilter) fitTo(N.filter(function (d) { return d.b === babFilter; }));
+            else svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity);
+          });
+          rescale();
+          select("agentic", true, true);
+        }
+        document.addEventListener("DOMContentLoaded", draw);
       })();
     </script>
   </body>
